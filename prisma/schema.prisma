@@ -20,7 +20,6 @@ model Guild {
   id          String        @id // Discord server ID
   name        String
   icon        String?
-  ownerId     String        // References the guild owner (not necessarily the user who added the bot)
   addedById   String        // References the user who added the bot
   addedBy     User          @relation(fields: [addedById], references: [id])
   settings    GuildSettings?
