@@ -18,8 +18,8 @@ const client = new ClientCommands({
 
 const app = express();
 const port = parseInt(process.env.PORT || "3000", 10);
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Initialize authentication routes
 setupAuthRoutes(app);
