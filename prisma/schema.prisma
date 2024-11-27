@@ -41,7 +41,7 @@ model GuildSettings {
   id         String   @id @default(cuid()) // Unique ID for settings
   guildId    String   @unique // One-to-One relationship with Guild
   guild      Guild    @relation(fields: [guildId], references: [id])
-  moderation Boolean   @default(false) // Example setting
+  moderation Boolean  @default(false) // Example setting
   createdAt  DateTime @default(now())
 }
 
@@ -49,7 +49,7 @@ model CommandStatus {
   id         String   @id @default(cuid()) // Unique ID for the command status
   guildId    String   // References the guild
   guild      Guild    @relation(fields: [guildId], references: [id])
-  channelId  String?  // References a channel (optional)
+  channelId  String?  // References a channel (optional, for channel-specific commands)
   channel    Channel? @relation(fields: [channelId], references: [id])
   command    String   // The command name (e.g., "ban", "kick")
   enabled    Boolean  @default(true) // Whether the command is enabled in this guild/channel
