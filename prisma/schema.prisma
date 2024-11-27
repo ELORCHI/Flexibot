@@ -1,0 +1,59 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id         String   @id // Discord user ID
+  username   String
+  avatar     String?
+  email      String?
+  guilds     Guild[]  // A user can add the bot to multiple guilds
+  createdAt  DateTime @default(now())
+}
+
+model Guild {
+  id          String        @id // Discord server ID
+  name        String
+  icon        String?
+  ownerId     String        // References the guild owner (not necessarily the user who added the bot)
+  addedById   String        // References the user who added the bot
+  addedBy     User          @relation(fields: [addedById], references: [id])
+  settings    GuildSettings?
+  commands    CommandStatus[]
+  channels    Channel[]
+  createdAt   DateTime      @default(now())
+}
+
+model Channel {
+  id         String   @id // Discord channel ID
+  name       String
+  guildId    String   // References the guild the channel belongs to
+  guild      Guild    @relation(fields: [guildId], references: [id])
+  createdAt  DateTime @default(now())
+  commands   CommandStatus[]
+}
+
+model GuildSettings {
+  id         String   @id @default(cuid()) // Unique ID for settings
+  guildId    String   @unique // One-to-One relationship with Guild
+  guild      Guild    @relation(fields: [guildId], references: [id])
+  moderation Boolean   @default(false) // Example setting
+  createdAt  DateTime @default(now())
+}
+
+model CommandStatus {
+  id         String   @id @default(cuid()) // Unique ID for the command status
+  guildId    String   // References the guild
+  guild      Guild    @relation(fields: [guildId], references: [id])
+  channelId  String?  // References a channel (optional)
+  channel    Channel? @relation(fields: [channelId], references: [id])
+  command    String   // The command name (e.g., "ban", "kick")
+  enabled    Boolean  @default(true) // Whether the command is enabled in this guild/channel
+  createdAt  DateTime @default(now())
+}
+
