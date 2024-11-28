@@ -1,7 +1,7 @@
 import { Command } from "../../types/command";
 import { SlashCommandBuilder, GuildMember, PermissionFlagsBits } from "discord.js";
 
-export const clearwarn: Command = {
+export const delwarn: Command = {
   data: new SlashCommandBuilder()
     .setName("clearwarn")
     .setDescription("Clear a specific warning for a member.")

@@ -1,5 +1,5 @@
 import { Command } from "../../types/command";
-import { SlashCommandBuilder, TextChannel, PermissionsBitField } from "discord.js";
+import { SlashCommandBuilder, TextChannel, PermissionFlagsBits } from "discord.js";
 
 export const clear: Command = {
   data: new SlashCommandBuilder()
@@ -7,13 +7,14 @@ export const clear: Command = {
     .setDescription("Clear a specified number of messages.")
     .addIntegerOption((option) =>
       option.setName("amount").setDescription("The number of messages to clear").setRequired(true)
-    ) as SlashCommandBuilder,
+    )    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages) as SlashCommandBuilder,
+
 
   execute: async (interaction) => {
     const amount = interaction.options.getInteger("amount");
 
     // Ensure the bot has permission to manage messages
-    if (!interaction.guild?.members.me?.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
+    if (!interaction.guild?.members.me?.permissions.has(PermissionFlagsBits.ManageMessages)) {
       await interaction.reply({
         content: "I don't have permission to manage messages.",
         ephemeral: true,

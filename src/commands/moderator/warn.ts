@@ -1,17 +1,18 @@
 import { Command } from "../../types/command";
-import { SlashCommandBuilder, GuildMember } from "discord.js";
+import { SlashCommandBuilder, GuildMember, PermissionFlagsBits } from "discord.js";
 
 export const warn: Command = {
   data: new SlashCommandBuilder()
     .setName("warn")
     .setDescription("Warn a member in the server.")
-    .addUserOption((option) =>
+    .addUserOption((option) => 
       option.setName("user").setDescription("The member to warn").setRequired(true)
     )
-    .addStringOption((option) =>
+    .addStringOption((option) => 
       option.setName("reason").setDescription("The reason for the warning").setRequired(false)
-    ) as SlashCommandBuilder,
-
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers) as SlashCommandBuilder,
+    
   execute: async (interaction) => {
     const targetMember = interaction.options.getMember("user");
     const reason = interaction.options.getString("reason") || "No reason provided";
@@ -26,7 +27,6 @@ export const warn: Command = {
 
     // You can store the warnings in a database or file, here we simply log it for the sake of the example
     console.log(`${targetMember.user.tag} has been warned. Reason: ${reason}`);
-
     await interaction.reply(`${targetMember.user.tag} has been warned. Reason: ${reason}`);
   },
 };

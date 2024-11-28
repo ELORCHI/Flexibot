@@ -1,5 +1,5 @@
 import { Command } from "../../types/command";
-import { SlashCommandBuilder, GuildMember, PermissionsBitField } from "discord.js";
+import { SlashCommandBuilder, GuildMember, PermissionFlagsBits} from "discord.js";
 
 export const mute: Command = {
   data: new SlashCommandBuilder()
@@ -7,7 +7,7 @@ export const mute: Command = {
     .setDescription("Mute a member in the server.")
     .addUserOption((option) =>
       option.setName("user").setDescription("The member to mute").setRequired(true)
-    ) as SlashCommandBuilder,
+    ).setDefaultMemberPermissions(PermissionFlagsBits.MuteMembers) as SlashCommandBuilder,
 
   execute: async (interaction) => {
     const targetMember = interaction.options.getMember("user");
@@ -22,7 +22,7 @@ export const mute: Command = {
 
     // Check if the bot has permission to mute the member
     const botMember = interaction.guild?.members.me;
-    if (!botMember || !botMember.permissions.has(PermissionsBitField.Flags.MuteMembers)) {
+    if (!botMember || !botMember.permissions.has(PermissionFlagsBits.MuteMembers)) {
       await interaction.reply({
         content: "I don't have permission to mute members.",
         ephemeral: true,

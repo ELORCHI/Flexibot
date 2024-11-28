@@ -19,8 +19,6 @@ export const rank: Command = {
       });
       return;
     }
-
-    // Simulate rank (can be connected to a database later)
     const rank = "Bronze";
 
     await interaction.reply(`${targetMember.user.tag}'s rank is ${rank}.`);

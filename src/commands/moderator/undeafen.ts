@@ -1,5 +1,5 @@
 import { Command } from "../../types/command";
-import { SlashCommandBuilder, GuildMember, PermissionsBitField } from "discord.js";
+import { SlashCommandBuilder, GuildMember, PermissionFlagsBits } from "discord.js";
 
 export const undeafen: Command = {
   data: new SlashCommandBuilder()
@@ -7,7 +7,8 @@ export const undeafen: Command = {
     .setDescription("Undeafen a member in the voice channel.")
     .addUserOption((option) =>
       option.setName("user").setDescription("The member to undeafen").setRequired(true)
-    ) as SlashCommandBuilder,
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers) as SlashCommandBuilder,
 
   execute: async (interaction) => {
     const targetMember = interaction.options.getMember("user");
@@ -21,7 +22,7 @@ export const undeafen: Command = {
     }
 
     // Check if the bot has permission to undeafen the member
-    if (!interaction.guild?.members.me?.permissions.has(PermissionsBitField.Flags.DeafenMembers)) {
+    if (!interaction.guild?.members.me?.permissions.has(PermissionFlagsBits.DeafenMembers)) {
       await interaction.reply({
         content: "I don't have permission to undeafen members.",
         ephemeral: true,

@@ -1,5 +1,5 @@
 import { Command } from "../../types/command";
-import { SlashCommandBuilder, GuildMember } from "discord.js";
+import { SlashCommandBuilder, GuildMember, PermissionFlagsBits } from "discord.js";
 
 export const kick: Command = {
   data: new SlashCommandBuilder()
@@ -7,7 +7,8 @@ export const kick: Command = {
     .setDescription("Kick a member from the server.")
     .addUserOption((option) =>
       option.setName("user").setDescription("The member to kick").setRequired(true)
-    ) as SlashCommandBuilder, // Type assertion here to ensure compatibility with Command type
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers) as SlashCommandBuilder,
 
   execute: async (interaction) => {
     const targetMember = interaction.options.getMember("user");
@@ -21,6 +22,16 @@ export const kick: Command = {
       return;
     }
 
+    // Check if the bot has the required permission to kick members
+    if (!interaction.guild?.members.me?.permissions.has(PermissionFlagsBits.KickMembers)) {
+      await interaction.reply({
+        content: "I don't have permission to kick members.",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    // Check if the member is kickable (not higher role or not the bot itself)
     if (!targetMember.kickable) {
       await interaction.reply({
         content: "I cannot kick this member. They may have a higher role or I lack permissions.",

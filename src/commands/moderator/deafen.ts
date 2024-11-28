@@ -1,5 +1,5 @@
 import { Command } from "../../types/command";
-import { SlashCommandBuilder, GuildMember, PermissionsBitField } from "discord.js";
+import { SlashCommandBuilder, GuildMember, PermissionFlagsBits } from "discord.js";
 
 export const deafen: Command = {
   data: new SlashCommandBuilder()
@@ -7,7 +7,8 @@ export const deafen: Command = {
     .setDescription("Deafen a member in the voice channel.")
     .addUserOption((option) =>
       option.setName("user").setDescription("The member to deafen").setRequired(true)
-    ) as SlashCommandBuilder,
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers) as SlashCommandBuilder,
 
   execute: async (interaction) => {
     const targetMember = interaction.options.getMember("user");
@@ -21,7 +22,7 @@ export const deafen: Command = {
     }
 
     // Check if the bot has permission to deafen the member
-    if (!interaction.guild?.members.me?.permissions.has(PermissionsBitField.Flags.DeafenMembers)) {
+    if (!interaction.guild?.members.me?.permissions.has(PermissionFlagsBits.DeafenMembers)) {
       await interaction.reply({
         content: "I don't have permission to deafen members.",
         ephemeral: true,
@@ -29,7 +30,6 @@ export const deafen: Command = {
       return;
     }
 
-    // Check if the member is already deafened
     if (targetMember.voice.serverDeaf) {
       await interaction.reply({
         content: `${targetMember.user.tag} is already deafened.`,
@@ -38,7 +38,6 @@ export const deafen: Command = {
       return;
     }
 
-    // Deafen the target member
     await targetMember.voice.setDeaf(true);
     await interaction.reply(`${targetMember.user.tag} has been deafened.`);
   },
