@@ -1,7 +1,7 @@
 import { Command } from "../../types/command";
 import { SlashCommandBuilder } from "discord.js";
 
-// need to be fixed, i dont understand what this command should do exactly
+// this should return a modlogs for a user
 export const modlogs: Command = {
   data: new SlashCommandBuilder()
     .setName("modlogs")
