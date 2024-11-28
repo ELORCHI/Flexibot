@@ -8,33 +8,37 @@ generator client {
 }
 
 model User {
-  id         String   @id // Discord user ID
-  username   String
-  avatar     String?
-  email      String?
-  guilds     Guild[]  // A user can add the bot to multiple guilds
-  createdAt  DateTime @default(now())
+  id        String   @id // Discord user ID
+  username  String
+  avatar    String?
+  email     String?
+  guilds    Guild[] // A user can add the bot to multiple guilds
+  createdAt DateTime @default(now())
 }
 
 model Guild {
-  id          String        @id // Discord server ID
-  name        String
-  icon        String?
-  addedById   String        // References the user who added the bot
-  addedBy     User          @relation(fields: [addedById], references: [id])
-  settings    GuildSettings?
-  commands    CommandStatus[]
-  channels    Channel[]
-  createdAt   DateTime      @default(now())
+  id        String          @id // Discord server ID
+  name      String
+  icon      String?
+  addedById String // References the user who added the bot
+  addedBy   User            @relation(fields: [addedById], references: [id])
+  settings  GuildSettings?
+  commands  CommandStatus[]
+  channels  Channel[]
+  modLogs   ModerationLog[] // Moderation logs for this guild
+  warnings  Warning[] // Warnings issued in this guild
+  polls     Poll[] // Polls created in this guild
+  createdAt DateTime        @default(now())
+  Rank      Rank[]
 }
 
 model Channel {
-  id         String   @id // Discord channel ID
-  name       String
-  guildId    String   // References the guild the channel belongs to
-  guild      Guild    @relation(fields: [guildId], references: [id])
-  createdAt  DateTime @default(now())
-  commands   CommandStatus[]
+  id        String          @id // Discord channel ID
+  name      String
+  guildId   String // References the guild the channel belongs to
+  guild     Guild           @relation(fields: [guildId], references: [id])
+  createdAt DateTime        @default(now())
+  commands  CommandStatus[]
 }
 
 model GuildSettings {
@@ -46,13 +50,63 @@ model GuildSettings {
 }
 
 model CommandStatus {
-  id         String   @id @default(cuid()) // Unique ID for the command status
-  guildId    String   // References the guild
-  guild      Guild    @relation(fields: [guildId], references: [id])
-  channelId  String?  // References a channel (optional, for channel-specific commands)
-  channel    Channel? @relation(fields: [channelId], references: [id])
-  command    String   // The command name (e.g., "ban", "kick")
-  enabled    Boolean  @default(true) // Whether the command is enabled in this guild/channel
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid()) // Unique ID for the command status
+  guildId   String // References the guild
+  guild     Guild    @relation(fields: [guildId], references: [id])
+  channelId String? // References a channel (optional, for channel-specific commands)
+  channel   Channel? @relation(fields: [channelId], references: [id])
+  command   String // The command name (e.g., "ban", "kick")
+  enabled   Boolean  @default(true) // Whether the command is enabled in this guild/channel
+  createdAt DateTime @default(now())
 }
 
+model Warning {
+  id          String   @id @default(cuid()) // Unique ID for the warning
+  guildId     String // Guild where the warning was issued
+  guild       Guild    @relation(fields: [guildId], references: [id])
+  userId      String // The user who was warned
+  moderatorId String // The moderator who issued the warning
+  reason      String?
+  createdAt   DateTime @default(now())
+}
+
+model ModerationLog {
+  id          String   @id @default(cuid()) // Unique ID for the moderation log
+  guildId     String // Guild where the action occurred
+  guild       Guild    @relation(fields: [guildId], references: [id])
+  action      String // Type of action (e.g., "kick", "ban", "mute")
+  targetId    String // The user who was targeted by the action
+  moderatorId String // The moderator who performed the action
+  userId     String   // Ensure this exists if you intend to use it
+  reason      String?
+  duration    Int? // Duration of the action (if applicable, e.g., mute duration)
+  createdAt   DateTime @default(now())
+}
+
+model Poll {
+  id        String       @id @default(cuid()) // Unique ID for the poll
+  guildId   String // Guild where the poll was created
+  guild     Guild        @relation(fields: [guildId], references: [id])
+  question  String // The poll question
+  options   PollOption[] // The poll options
+  createdBy String // The user who created the poll
+  createdAt DateTime     @default(now())
+}
+
+model PollOption {
+  id     String @id @default(cuid()) // Unique ID for the poll option
+  pollId String // References the poll
+  poll   Poll   @relation(fields: [pollId], references: [id])
+  text   String // Option text
+  votes  Int    @default(0) // Number of votes for the option
+}
+
+model Rank {
+  id        String   @id @default(cuid()) // Unique ID for the rank
+  guildId   String // The guild where the rank exists
+  guild     Guild    @relation(fields: [guildId], references: [id])
+  roleId    String // The role ID associated with this rank
+  roleName  String // Name of the rank/role
+  createdBy String // The user who created the rank
+  createdAt DateTime @default(now())
+}
