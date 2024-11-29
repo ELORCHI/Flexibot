@@ -6,7 +6,10 @@ export const userinfo: Command = {
     .setName("userinfo")
     .setDescription("Get information about a user.")
     .addUserOption((option) =>
-      option.setName("user").setDescription("The user to fetch info about").setRequired(false)
+      option
+        .setName("user")
+        .setDescription("The user to fetch info about")
+        .setRequired(false)
     ) as SlashCommandBuilder,
 
   execute: async (interaction) => {
@@ -18,8 +21,16 @@ export const userinfo: Command = {
       .addFields(
         { name: "User ID", value: targetUser.id, inline: true },
         { name: "Username", value: targetUser.username, inline: true },
-        { name: "Discriminator", value: `#${targetUser.discriminator}`, inline: true },
-        { name: "Account Created", value: targetUser.createdAt.toDateString(), inline: false }
+        {
+          name: "Discriminator",
+          value: `#${targetUser.discriminator}`,
+          inline: true,
+        },
+        {
+          name: "Account Created",
+          value: targetUser.createdAt.toDateString(),
+          inline: false,
+        }
       );
 
     await interaction.reply({ embeds: [embed] });
