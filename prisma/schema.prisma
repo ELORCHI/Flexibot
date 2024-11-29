@@ -22,34 +22,30 @@ model Guild {
   icon      String?
   addedById String // References the user who added the bot
   addedBy   User            @relation(fields: [addedById], references: [id])
-  commands  CommandStatus[]
-  channels  Channel[]
   modLogs   ModerationLog[] // Moderation logs for this guild
   warnings  Warning[] // Warnings issued in this guild
   polls     Poll[] // Polls created in this guild
   createdAt DateTime        @default(now())
   Rank      Rank[]
   enabled   Boolean         @default(false)
+  commands  command[]
 }
 
-model Channel {
-  id        String          @id // Discord channel ID
-  name      String
-  guildId   String // References the guild the channel belongs to
-  guild     Guild           @relation(fields: [guildId], references: [id])
-  createdAt DateTime        @default(now())
-  commands  CommandStatus[]
-}
+// commnads
+// chaneel allowd 
+// roles allowd
 
-model CommandStatus {
-  id        String   @id @default(cuid()) // Unique ID for the command status
-  guildId   String // References the guild
-  guild     Guild    @relation(fields: [guildId], references: [id])
-  channelId String? // References a channel (optional, for channel-specific commands)
-  channel   Channel? @relation(fields: [channelId], references: [id])
-  command   String // The command name (e.g., "ban", "kick")
-  enabled   Boolean  @default(true) // Whether the command is enabled in this guild/channel
-  createdAt DateTime @default(now())
+// insert guild an user
+// update command config
+model command {
+  id              Int     @id @default(autoincrement())
+  guildId         String
+  guild           Guild   @relation(fields: [guildId], references: [id])
+  allowedChannels String?
+  ignoredChannels String?
+  allowedRoles    String?
+  ignoredRoles    String?
+  enabled         Boolean @default(true)
 }
 
 model Warning {
@@ -69,7 +65,7 @@ model ModerationLog {
   action      String // Type of action (e.g., "kick", "ban", "mute")
   targetId    String // The user who was targeted by the action
   moderatorId String // The moderator who performed the action
-  userId     String   // Ensure this exists if you intend to use it
+  userId      String // Ensure this exists if you intend to use it
   reason      String?
   duration    Int? // Duration of the action (if applicable, e.g., mute duration)
   createdAt   DateTime @default(now())
