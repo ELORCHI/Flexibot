@@ -1,4 +1,4 @@
-import { prisma } from "./db";
+import { prisma } from "./prismaClient";
 
 // Function to get a user by ID
 export const getUserById = async (id: string) => {

@@ -1,4 +1,4 @@
-import { prisma } from "./db";
+import { prisma } from "./prismaClient";
 
 // Function to get command status by guild and command name
 export const getCommandStatus = async (guildId: string, command: string) => {

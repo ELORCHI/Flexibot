@@ -1,4 +1,4 @@
-import { prisma } from "./db";
+import { prisma } from "./prismaClient";
 
 // Function to get a guild by ID
 export const getGuildById = async (guildId: string) => {

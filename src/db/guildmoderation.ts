@@ -1,4 +1,4 @@
-import { prisma } from "./db";
+import { prisma } from "./prismaClient";
 
 // Function to create a warning
 export const createWarning = async (data: {
