@@ -29,6 +29,7 @@ model Guild {
   polls     Poll[] // Polls created in this guild
   createdAt DateTime        @default(now())
   Rank      Rank[]
+  enabled   Boolean         @default(false)
 }
 
 model Channel {
