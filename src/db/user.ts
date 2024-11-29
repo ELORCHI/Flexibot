@@ -64,3 +64,48 @@ export const deleteUser = async (id: string) => {
     throw error;
   }
 };
+
+export async function saveUserAndGuilds(user: any, guilds: any[]) {
+  try {
+    // Upsert user (create or update if exists)
+    const savedUser = await prisma.user.upsert({
+      where: { id: user.id },
+      update: {
+        username: user.username,
+        avatar: user.avatar,
+        email: user.email,
+      },
+      create: {
+        id: user.id,
+        username: user.username,
+        avatar: user.avatar,
+        email: user.email,
+      },
+    });
+
+    // Save or update guilds the user is in
+    const guildUpsertPromises = guilds.map(async (guild: any) => {
+      return prisma.guild.upsert({
+        where: { id: guild.id },
+        update: {
+          name: guild.name,
+          icon: guild.icon,
+        },
+        create: {
+          id: guild.id,
+          name: guild.name,
+          icon: guild.icon,
+          addedById: user.id,
+        },
+      });
+    });
+
+    // Wait for all guild upserts to complete
+    await Promise.all(guildUpsertPromises);
+
+    return savedUser;
+  } catch (error) {
+    console.error("Error saving user and guilds:", error);
+    throw error;
+  }
+}
