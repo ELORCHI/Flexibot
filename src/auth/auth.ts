@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import axios from "axios";
+import { saveUserAndGuilds } from "../db/user";
 
 const discordAuthBaseUrl = "https://discord.com/api/oauth2";
 
@@ -19,16 +20,14 @@ export const setupAuthRoutes = (app: express.Application) => {
   // Handle the OAuth2 callback
   app.get("/auth/discord/callback", async (req: any, res: any) => {
     const code = req.query.code as string;
-
     if (!code) {
       return res.status(400).send("Authorization code is missing.");
     }
-
     try {
       // Exchange the code for an access token
       const tokenResponse = await axios.post(
         `${discordAuthBaseUrl}/token`,
-        new URLSearchParams({   
+        new URLSearchParams({
           client_id: clientId,
           client_secret: clientSecret,
           grant_type: "authorization_code",
@@ -39,21 +38,32 @@ export const setupAuthRoutes = (app: express.Application) => {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }
       );
-
       const { access_token, token_type } = tokenResponse.data;
-      console.log({ access_token, token_type })
 
       // Fetch user data
-      const userResponse = await axios.get('https://discord.com/api/v10/users/@me', {
-        headers: { Authorization: `${token_type} ${access_token}` },
-      });
-
+      const userResponse = await axios.get(
+        "https://discord.com/api/v10/users/@me",
+        {
+          headers: { Authorization: `${token_type} ${access_token}` },
+        }
+      );
       const user = userResponse.data;
 
-      // Placeholder: Store user data in the database here
-      console.log("Authenticated User:", user);
+      // Fetch user's guilds
+      const guildsResponse = await axios.get(
+        "https://discord.com/api/v10/users/@me/guilds",
+        {
+          headers: { Authorization: `${token_type} ${access_token}` },
+        }
+      );
+      const guilds = guildsResponse.data;
 
-      res.send(`Hello, ${user.username}! Authentication successful.`);
+      // Save user and guilds to database
+      await saveUserAndGuilds(user, guilds);
+
+      res.send(
+        `Hello, ${user.username}! Authentication and data save successful.`
+      );
     } catch (error) {
       console.error("OAuth2 error:", error);
       res.status(500).send("Authentication failed.");
