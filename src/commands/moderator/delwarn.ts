@@ -7,7 +7,7 @@ import {
 
 export const delwarn: Command = {
   data: new SlashCommandBuilder()
-    .setName("delrwarn")
+    .setName("delwarn")
     .setDescription("Clear a specific warning for a member.")
     .addUserOption((option) =>
       option
