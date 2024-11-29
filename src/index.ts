@@ -1,13 +1,14 @@
 import dotenv from "dotenv";
 import express from "express";
-import ClientCommands from "./types/discord";
+import ClientWithCommands from "./types/discord";
 import { setupAuthRoutes } from "./auth/auth";
+import registerEvets from "./events/registerEvents";
 
 dotenv.config();
 
-const client = new ClientCommands({
+const client = new ClientWithCommands({
   intents: [
-    // Replace with your required intents 
+    // Replace with your required intents
     "Guilds",
     "GuildMessages",
     "MessageContent",
@@ -25,6 +26,7 @@ setupAuthRoutes(app);
 // Discord client login
 client.once("ready", () => {
   console.log(`Bot logged in as ${client.user?.tag}`);
+  registerEvets(client);
 });
 
 client.login(process.env.DISCORD_BOT_TOKEN);
