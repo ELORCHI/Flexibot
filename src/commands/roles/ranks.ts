@@ -3,10 +3,13 @@ import { SlashCommandBuilder, GuildMember } from "discord.js";
 
 export const rank: Command = {
   data: new SlashCommandBuilder()
-    .setName("rank")
+    .setName("ranks")
     .setDescription("Display the rank of a member.")
     .addUserOption((option) =>
-      option.setName("user").setDescription("The member to check rank for").setRequired(true)
+      option
+        .setName("user")
+        .setDescription("The member to check rank for")
+        .setRequired(true)
     ) as SlashCommandBuilder,
 
   execute: async (interaction) => {
