@@ -34,7 +34,6 @@ async function registerGuildCommands(
       }
       return commandFiles;
     };
-
     // Get all command files in the commands directory (including subdirectories)
     const commandFiles = getCommandFiles(commandsDir);
 
@@ -53,6 +52,8 @@ async function registerGuildCommands(
 
           if (command?.data) {
             commandData.push(command.data.toJSON()); // Convert SlashCommandBuilder to JSON
+            console.log({ command });
+            client.commands.set(command.data.name, command);
           } else {
             console.warn(
               `Export "${exportKey}" in file ${file} is not a valid command.`
@@ -63,11 +64,6 @@ async function registerGuildCommands(
         console.error(`Error importing command file ${file}:`, error);
       }
     }
-
-    console.log({ commandsDir });
-    console.log({ commandFiles });
-    console.log({ commandData });
-
     // Initialize REST API client
     const rest = new REST({ version: "10" }).setToken(
       process.env.DISCORD_BOT_TOKEN!
