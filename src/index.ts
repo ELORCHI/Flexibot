@@ -3,8 +3,6 @@ import express from "express";
 import ClientCommands from "./types/discord";
 import { setupAuthRoutes } from "./auth/auth";
 
-import bodyParser from "body-parser";
-
 dotenv.config();
 
 const client = new ClientCommands({

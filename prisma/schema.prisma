@@ -22,7 +22,6 @@ model Guild {
   icon      String?
   addedById String // References the user who added the bot
   addedBy   User            @relation(fields: [addedById], references: [id])
-  settings  GuildSettings?
   commands  CommandStatus[]
   channels  Channel[]
   modLogs   ModerationLog[] // Moderation logs for this guild
@@ -39,14 +38,6 @@ model Channel {
   guild     Guild           @relation(fields: [guildId], references: [id])
   createdAt DateTime        @default(now())
   commands  CommandStatus[]
-}
-
-model GuildSettings {
-  id         String   @id @default(cuid()) // Unique ID for settings
-  guildId    String   @unique // One-to-One relationship with Guild
-  guild      Guild    @relation(fields: [guildId], references: [id])
-  moderation Boolean  @default(false) // Example setting
-  createdAt  DateTime @default(now())
 }
 
 model CommandStatus {
