@@ -27,7 +27,6 @@ model Guild {
   polls     Poll[] // Polls created in this guild
   createdAt DateTime        @default(now())
   Rank      Rank[]
-  enabled   Boolean         @default(false)
   commands  command[]
 }
 
@@ -40,12 +39,15 @@ model Guild {
 model command {
   id              Int     @id @default(autoincrement())
   guildId         String
+  name            String
   guild           Guild   @relation(fields: [guildId], references: [id])
   allowedChannels String?
   ignoredChannels String?
   allowedRoles    String?
   ignoredRoles    String?
   enabled         Boolean @default(true)
+
+  @@unique([guildId, name])
 }
 
 model Warning {
