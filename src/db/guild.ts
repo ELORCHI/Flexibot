@@ -129,3 +129,47 @@ export const createGuildWithDefaultCommands = async (guildData: {
     throw error;
   }
 };
+
+export const deleteGuildWithAllRelatedRecords = async (guildId: string) => {
+  try {
+    // Use a transaction to ensure all deletions happen atomically
+    const result = await prisma.$transaction(async (prisma) => {
+      // Delete related records first (in order of dependencies)
+      await prisma.pollOption.deleteMany({
+        where: { poll: { guildId } },
+      });
+
+      await prisma.poll.deleteMany({
+        where: { guildId },
+      });
+
+      await prisma.rank.deleteMany({
+        where: { guildId },
+      });
+
+      await prisma.warning.deleteMany({
+        where: { guildId },
+      });
+
+      await prisma.moderationLog.deleteMany({
+        where: { guildId },
+      });
+
+      await prisma.command.deleteMany({
+        where: { guildId },
+      });
+
+      // Finally, delete the guild itself
+      const deletedGuild = await prisma.guild.delete({
+        where: { id: guildId },
+      });
+
+      return deletedGuild;
+    });
+
+    return result;
+  } catch (error) {
+    console.error("Error deleting guild and related records:", error);
+    throw error;
+  }
+};
