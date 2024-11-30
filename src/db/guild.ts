@@ -18,7 +18,7 @@ export const createGuild = async (data: {
   id: string; // Discord guild ID
   name: string;
   icon?: string;
-  addedById: string; // User who added the bot
+  addedById?: string; // Make this optional by adding ?
 }) => {
   try {
     const guild = await prisma.guild.create({
