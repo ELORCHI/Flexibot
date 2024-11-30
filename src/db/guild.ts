@@ -13,20 +13,21 @@ export const getGuildById = async (guildId: string) => {
   }
 };
 
-// Function to create a new guild
 export const createGuild = async (data: {
   id: string; // Discord guild ID
   name: string;
   icon?: string;
-  addedById?: string; // Make this optional by adding ?
+  addedById?: string; // Optional field
 }) => {
   try {
-    const guild = await prisma.guild.create({
-      data,
+    const guild = await prisma.guild.upsert({
+      where: { id: data.id },
+      update: { ...data },
+      create: { ...data },
     });
     return guild;
   } catch (error) {
-    console.error("Error creating guild:", error);
+    console.error("Error upserting guild:", error);
     throw error;
   }
 };
@@ -100,9 +101,7 @@ export const createGuildWithDefaultCommands = async (guildData: {
 }) => {
   try {
     // Create the guild first
-    const guild = await prisma.guild.create({
-      data: guildData,
-    });
+    const guild = await createGuild(guildData);
 
     // Create default commands for the guild
     const commandPromises = defaultCommands.map((commandName) =>
