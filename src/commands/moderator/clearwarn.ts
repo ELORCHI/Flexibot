@@ -66,7 +66,6 @@ export const clearwarn: Command = {
             action: "clear_warnings",
             targetId: targetMember.id,
             moderatorId: interaction.user.id,
-            userId: targetMember.id,
             reason: "Cleared all warnings",
           },
         });

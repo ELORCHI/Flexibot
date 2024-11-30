@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 const rank: Command = {
   data: new SlashCommandBuilder()
-    .setName("rank")
+    .setName("ranks")
     .setDescription("List all ranks in the server"),
   async execute(interaction) {
     const guildId = interaction.guildId;
