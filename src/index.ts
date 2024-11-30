@@ -24,7 +24,7 @@ app.use(express.json());
 setupAuthRoutes(app);
 
 // Discord client login
-client.once("ready", () => {
+client.once("ready", async () => {
   console.log(`Bot logged in as ${client.user?.tag}`);
   registerEvets(client);
 });
