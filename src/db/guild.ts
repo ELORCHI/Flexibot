@@ -55,13 +55,17 @@ export const updateGuild = async (
 // Function to delete a guild by ID
 export const deleteGuild = async (guildId: string) => {
   try {
-    const deletedGuild = await prisma.guild.delete({
+    const g = await prisma.guild.findUnique({
       where: { id: guildId },
     });
-    return deletedGuild;
+    if (g) {
+      const deletedGuild = await prisma.guild.delete({
+        where: { id: guildId },
+      });
+      return deletedGuild;
+    }
   } catch (error) {
     console.error("Error deleting guild:", error);
-    throw error;
   }
 };
 
@@ -169,6 +173,6 @@ export const deleteGuildWithAllRelatedRecords = async (guildId: string) => {
     return result;
   } catch (error) {
     console.error("Error deleting guild and related records:", error);
-    throw error;
+    // throw error;
   }
 };
