@@ -80,7 +80,6 @@ export const warn: Command = {
             action: "warn",
             targetId: targetMember.id,
             moderatorId: interaction.user.id,
-            userId: targetMember.id,
             reason: reason,
           },
         });

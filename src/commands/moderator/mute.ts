@@ -82,7 +82,6 @@ export const mute: Command = {
           action: "mute",
           targetId: targetMember.id,
           moderatorId: interaction.user.id,
-          userId: targetMember.id,
           reason,
         },
       });

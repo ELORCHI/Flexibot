@@ -87,7 +87,6 @@ export const delwarn: Command = {
             action: "delete_warning",
             targetId: targetMember.id,
             moderatorId: interaction.user.id,
-            userId: targetMember.id,
             reason: `Deleted warning #${warningId}`,
           },
         });

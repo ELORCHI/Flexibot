@@ -82,7 +82,6 @@ export const kick: Command = {
           action: "kick",
           targetId: targetMember.id,
           moderatorId: interaction.user.id,
-          userId: targetMember.id, // Add the userId field here
           reason,
         },
       });

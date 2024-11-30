@@ -8,12 +8,13 @@ generator client {
 }
 
 model User {
-  id        String   @id // Discord user ID
+  id        String     @id // Discord user ID
   username  String
   avatar    String?
   email     String?
   guilds    Guild[] // A user can add the bot to multiple guilds
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
+  UserRank  UserRank[]
 }
 
 model Guild {
@@ -67,7 +68,6 @@ model ModerationLog {
   action      String // Type of action (e.g., "kick", "ban", "mute")
   targetId    String // The user who was targeted by the action
   moderatorId String // The moderator who performed the action
-  userId      String // Ensure this exists if you intend to use it
   reason      String?
   duration    Int? // Duration of the action (if applicable, e.g., mute duration)
   createdAt   DateTime @default(now())
@@ -92,11 +92,23 @@ model PollOption {
 }
 
 model Rank {
-  id        String   @id @default(cuid()) // Unique ID for the rank
+  id        String     @id @default(cuid()) // Unique ID for the rank
   guildId   String // The guild where the rank exists
-  guild     Guild    @relation(fields: [guildId], references: [id])
-  roleId    String // The role ID associated with this rank
+  guild     Guild      @relation(fields: [guildId], references: [id])
   roleName  String // Name of the rank/role
+  rankName  String
   createdBy String // The user who created the rank
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
+  UserRank  UserRank[]
+}
+
+model UserRank {
+  id       String   @id @default(cuid())
+  userId   String
+  user     User     @relation(fields: [userId], references: [id])
+  rankId   String
+  rank     Rank     @relation(fields: [rankId], references: [id])
+  joinedAt DateTime @default(now())
+
+  @@unique([userId, rankId]) // Prevent duplicate entries
 }

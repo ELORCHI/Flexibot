@@ -1,31 +1,40 @@
+import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { Command } from "../../types/command";
-import { SlashCommandBuilder, GuildMember } from "discord.js";
+import { PrismaClient } from "@prisma/client";
 
-export const rank: Command = {
+const prisma = new PrismaClient();
+
+const rank: Command = {
   data: new SlashCommandBuilder()
-    .setName("ranks")
-    .setDescription("Display the rank of a member.")
-    .addUserOption((option) =>
-      option
-        .setName("user")
-        .setDescription("The member to check rank for")
-        .setRequired(true)
-    ) as SlashCommandBuilder,
-
-  execute: async (interaction) => {
-    const targetMember = interaction.options.getMember("user");
-
-    if (!targetMember || !(targetMember instanceof GuildMember)) {
-      await interaction.reply({
-        content: "Could not find the member or the user is not a valid member.",
-        ephemeral: true,
-      });
+    .setName("rank")
+    .setDescription("List all ranks in the server"),
+  async execute(interaction) {
+    const guildId = interaction.guildId;
+    if (!guildId) {
+      await interaction.reply("This command can only be used in a server.");
       return;
     }
 
-    // Simulate getting rank. Replace with database integration later.
-    const rank = "Silver"; // Example rank. You can replace this with actual database logic.
+    const ranks = await prisma.rank.findMany({
+      where: { guildId },
+    });
 
-    await interaction.reply(`${targetMember.user.tag}'s rank is: ${rank}`);
+    if (!ranks.length) {
+      await interaction.reply("No ranks have been set up in this server.");
+      return;
+    }
+
+    const embed = new EmbedBuilder()
+      .setTitle("Ranks in this Server")
+      .setDescription(
+        ranks
+          .map((rank) => `• **${rank.rankName}**: ${rank.roleName}`)
+          .join("\n")
+      )
+      .setColor(0x00ff00);
+
+    await interaction.reply({ embeds: [embed] });
   },
 };
+
+export default rank;
