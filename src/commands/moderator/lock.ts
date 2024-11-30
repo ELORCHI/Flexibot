@@ -1,17 +1,12 @@
 import {
   ChatInputCommandInteraction,
   SlashCommandBuilder,
-  SlashCommandSubcommandsOnlyBuilder,
   PermissionFlagsBits,
   TextChannel,
   OverwriteType,
   OverwriteResolvable,
 } from "discord.js";
-
-export interface Command {
-  data: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder;
-  execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
-}
+import { Command } from "../../types/command";
 
 // Utility function to parse duration
 function parseDuration(duration: string): number {
