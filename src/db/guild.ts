@@ -63,3 +63,69 @@ export const deleteGuild = async (guildId: string) => {
     throw error;
   }
 };
+
+const defaultCommands = [
+  "ping",
+  "serverinfo",
+  "userinfo",
+  "clearwarn",
+  "deafen",
+  "delwarn",
+  "kick",
+  "lock",
+  "modlogs",
+  "mute",
+  "softban",
+  "undeafen",
+  "unlock",
+  "warn",
+  "addrank",
+  "ranks",
+  "rank",
+  "roles",
+  "clean",
+  "clear",
+  "delslmode",
+  "remind",
+  "setnick",
+  "slowmode",
+];
+
+// Function to create a guild and its default commands
+export const createGuildWithDefaultCommands = async (guildData: {
+  id: string;
+  name: string;
+  icon?: string;
+  addedById?: string;
+}) => {
+  try {
+    // Create the guild first
+    const guild = await prisma.guild.create({
+      data: guildData,
+    });
+
+    // Create default commands for the guild
+    const commandPromises = defaultCommands.map((commandName) =>
+      prisma.command.create({
+        data: {
+          guildId: guild.id,
+          name: commandName,
+          // Other fields will use default values as specified in the schema
+        },
+      })
+    );
+
+    // Execute all command creation promises
+    const createdCommands = await Promise.all(commandPromises);
+
+    // Return the guild with its created commands\
+    console.log({ guild, createdCommands });
+    return {
+      guild,
+      commands: createdCommands,
+    };
+  } catch (error) {
+    console.error("Error creating guild with default commands:", error);
+    throw error;
+  }
+};
