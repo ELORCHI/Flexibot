@@ -28,25 +28,27 @@ model Guild {
   polls     Poll[] // Polls created in this guild
   createdAt DateTime        @default(now())
   Rank      Rank[]
-  commands  command[]
+  commands  Command[]
 }
 
-// commnads
-// chaneel allowd 
-// roles allowd
+enum CommandCategory {
+  INFO
+  MODERATION
+  UTILITY
+  RANKS
+}
 
-// insert guild an user
-// update command config
-model command {
-  id              Int     @id @default(autoincrement())
+model Command {
+  id              Int             @id @default(autoincrement())
   guildId         String
   name            String
-  guild           Guild   @relation(fields: [guildId], references: [id])
+  guild           Guild           @relation(fields: [guildId], references: [id])
+  category        CommandCategory // Add this line
   allowedChannels String?
   ignoredChannels String?
   allowedRoles    String?
   ignoredRoles    String?
-  enabled         Boolean @default(true)
+  enabled         Boolean         @default(true)
 
   @@unique([guildId, name])
 }
