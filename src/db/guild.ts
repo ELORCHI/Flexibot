@@ -108,29 +108,28 @@ export const createGuildWithDefaultCommands = async (guildData: {
     // Create the guild first
     const guild = await createGuild(guildData);
 
-    // Create default commands for the guild
-    const commandPromises = Object.entries(commandCategories).flatMap(
+    // Prepare commands data for batch creation
+    const commandsData = Object.entries(commandCategories).flatMap(
       ([category, commands]) =>
-        commands.map((commandName) =>
-          prisma.command.create({
-            data: {
-              guildId: guild.id,
-              name: commandName,
-              category: category as keyof typeof CommandCategory, // Use keyof typeof for type safety
-              description: getCommandDescription(commandName),
-            },
-          })
-        )
+        commands.map((commandName) => ({
+          guildId: guild.id,
+          name: commandName,
+          category: category as keyof typeof CommandCategory, // Type safety
+          description: getCommandDescription(commandName),
+        }))
     );
 
-    // Execute all command creation promises
-    const createdCommands = await Promise.all(commandPromises);
+    // Use createMany for batch insertion of commands
+    await prisma.command.createMany({
+      data: commandsData,
+      skipDuplicates: true, // Optional: Avoid inserting duplicates if needed
+    });
 
-    // Return the guild with its created commands
-    console.log({ guild, createdCommands });
+    // Return the guild with the number of created commands
+    console.log({ guild, commandsCreated: commandsData.length });
     return {
       guild,
-      commands: createdCommands,
+      commands: commandsData,
     };
   } catch (error) {
     console.error("Error creating guild with default commands:", error);
