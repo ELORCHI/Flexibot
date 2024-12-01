@@ -3,7 +3,7 @@ import express from "express";
 import ClientWithCommands from "./types/discord";
 import { setupAuthRoutes } from "./auth/auth";
 import registerEvets from "./events/registerEvents";
-
+import { loadCommands } from "./utils/registerCommands";
 dotenv.config();
 
 const client = new ClientWithCommands({
@@ -27,6 +27,7 @@ setupAuthRoutes(app);
 client.once("ready", async () => {
   console.log(`Bot logged in as ${client.user?.tag}`);
   registerEvets(client);
+  await loadCommands(client, "/commands");
 });
 
 client.login(process.env.DISCORD_BOT_TOKEN);
