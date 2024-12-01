@@ -49,6 +49,7 @@ model Command {
   allowedRoles    String?
   ignoredRoles    String?
   enabled         Boolean         @default(true)
+  description     String
 
   @@unique([guildId, name])
 }
