@@ -1,40 +1,5 @@
 import { prisma } from "./prismaClient";
-
-export const createGuildWithCommands = async (
-  guildData: {
-    id: string;
-    name: string;
-    addedById: string;
-    icon?: string;
-    enabled?: boolean;
-  },
-  commands: Array<{
-    name: string;
-    allowedChannels?: string;
-    ignoredChannels?: string;
-    allowedRoles?: string;
-    ignoredRoles?: string;
-  }>
-) => {
-  try {
-    const guild = await prisma.guild.create({
-      data: {
-        ...guildData,
-        commands: {
-          create: commands,
-        },
-      },
-      include: {
-        commands: true,
-      },
-    });
-
-    return guild;
-  } catch (error) {
-    console.error("Error creating guild with commands:", error);
-    throw error;
-  }
-};
+import { CommandCategory } from "@prisma/client"; // Import the CommandCategory enum
 
 /**
  * Retrieve a specific command's configuration for a guild
@@ -98,3 +63,48 @@ export const updateCommandConfig = async (
     throw error;
   }
 };
+
+type GroupedCommands = {
+  [category in CommandCategory]: {
+    name: string;
+    description: string | null;
+    enabled: boolean;
+  }[];
+};
+
+export async function getGuildCommandsByCategory(
+  guildId: string
+): Promise<GroupedCommands> {
+  // Fetch all commands for the specific guild
+  const commands = await prisma.command.findMany({
+    where: {
+      guildId: guildId,
+    },
+    select: {
+      name: true,
+      category: true,
+      description: true,
+      enabled: true,
+    },
+    orderBy: {
+      name: "asc", // Optional: sort commands alphabetically within each category
+    },
+  });
+
+  // Group commands by category
+  return commands.reduce((grouped, command) => {
+    // Ensure the category array exists
+    if (!grouped[command.category]) {
+      grouped[command.category] = [];
+    }
+
+    // Add the command to its category
+    grouped[command.category].push({
+      name: command.name,
+      description: command.description,
+      enabled: command.enabled,
+    });
+
+    return grouped;
+  }, {} as GroupedCommands);
+}
