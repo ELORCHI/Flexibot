@@ -34,8 +34,8 @@ model Guild {
 enum CommandCategory {
   INFO
   MODERATION
-  UTILITY
-  RANKS
+  UTILS
+  ROLES
 }
 
 model Command {
