@@ -39,17 +39,20 @@ enum CommandCategory {
 }
 
 model Command {
-  id              Int             @id @default(autoincrement())
-  guildId         String
-  name            String
-  guild           Guild           @relation(fields: [guildId], references: [id])
-  category        CommandCategory // Add this line
-  allowedChannels String?
-  ignoredChannels String?
-  allowedRoles    String?
-  ignoredRoles    String?
-  enabled         Boolean         @default(true)
-  description     String
+  id                  Int             @id @default(autoincrement())
+  guildId             String
+  name                String
+  guild               Guild           @relation(fields: [guildId], references: [id])
+  category            CommandCategory // Add this line
+  allowedChannels     String?
+  ignoredChannels     String?
+  allowedRoles        String?
+  ignoredRoles        String?
+  enabled             Boolean         @default(true)
+  description         String
+  requiredpermissions String
+  usage               String
+  example             String
 
   @@unique([guildId, name])
 }
