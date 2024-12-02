@@ -36,6 +36,7 @@ enum CommandCategory {
   MODERATION
   UTILS
   ROLES
+  MANAGER
 }
 
 model Command {

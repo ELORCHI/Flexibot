@@ -3,39 +3,39 @@ export const commandCategories = {
     {
       name: "ping",
       requiredpermissions: "",
-      usage: "",
-      example: "",
+      usage: "/ping",
+      example: "/ping",
       description: "Check the bot's latency",
     },
     {
       name: "serverinfo",
       requiredpermissions: "",
-      usage: "",
-      example: "",
+      usage: "/serverinfo",
+      example: "/serverinfo",
       description: "Get information about the server",
     },
     {
       name: "userinfo",
       requiredpermissions: "",
-      usage: "",
-      example: "",
+      usage: "/userinfo <user>",
+      example: "/userinfo @JohnDoe",
       description: "Get information about a user",
     },
   ],
   MODERATION: [
     {
-      name: "clearwarn",
+      name: "deafen",
       requiredpermissions: "",
       usage: "",
       example: "",
-      description: "Clear warnings for a user",
+      description: "Deafen a user",
     },
     {
-      name: "delwarn",
+      name: "kick",
       requiredpermissions: "",
       usage: "",
       example: "",
-      description: "Delete a specific warning",
+      description: "Kick a user from the server",
     },
     {
       name: "lock",
@@ -59,25 +59,18 @@ export const commandCategories = {
       description: "Undeafen a user",
     },
     {
+      name: "delwarn",
+      requiredpermissions: "",
+      usage: "",
+      example: "",
+      description: "Delete a specific warning",
+    },
+    {
       name: "warn",
       requiredpermissions: "",
       usage: "",
       example: "",
       description: "Warn a user",
-    },
-    {
-      name: "deafen",
-      requiredpermissions: "",
-      usage: "",
-      example: "",
-      description: "Deafen a user",
-    },
-    {
-      name: "kick",
-      requiredpermissions: "",
-      usage: "",
-      example: "",
-      description: "Kick a user from the server",
     },
     {
       name: "modlogs",
@@ -93,13 +86,25 @@ export const commandCategories = {
       example: "",
       description: "Soft ban a user",
     },
+    // need to add ban and unban
+  ],
+  MANAGER: [
     {
-      name: "unlock",
+      name: "clearwarn",
       requiredpermissions: "",
       usage: "",
       example: "",
-      description: "Unlock a channel",
+      description: "Clear warnings for a user",
     },
+    {
+      name: "addRole",
+      requiredpermissions: "",
+      usage: "",
+      example: "",
+      description: "Add a role to a user",
+    },
+    // delrole
+    //nickk
   ],
   ROLES: [
     {
@@ -108,13 +113,6 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Add a new rank",
-    },
-    {
-      name: "addRole",
-      requiredpermissions: "",
-      usage: "",
-      example: "",
-      description: "Add a role to a user",
     },
     {
       name: "delrank",
