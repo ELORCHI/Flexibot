@@ -1,44 +1,42 @@
 import { Command } from "../../types/command";
-import { SlashCommandBuilder, GuildMember, EmbedBuilder } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 
 export const roles: Command = {
   data: new SlashCommandBuilder()
     .setName("roles")
-    .setDescription("Display the roles of a member.")
-    .addUserOption((option) =>
-      option
-        .setName("user")
-        .setDescription("The member to check roles for")
-        .setRequired(true)
-    ) as SlashCommandBuilder,
-
+    .setDescription("Display all server roles"),
   execute: async (interaction) => {
-    const targetMember = interaction.options.getMember("user");
-
-    if (!targetMember || !(targetMember instanceof GuildMember)) {
+    // Ensure the interaction is in a guild
+    if (!interaction.guild) {
       await interaction.reply({
-        content: "Could not find the member or the user is not a valid member.",
+        content: "This command can only be used in a server.",
         ephemeral: true,
       });
       return;
     }
 
-    const roles = targetMember.roles.cache
-      .filter((role) => role.name !== "@everyone") // Exclude the default @everyone role
-      .map((role) => role.name)
-      .join(", ");
+    // Fetch all roles in the server, excluding @everyone
+    const serverRoles = interaction.guild.roles.cache
+      .filter((role) => role.name !== "@everyone")
+      .sort((a, b) => b.position - a.position) // Sort roles by position (highest to lowest)
+      .map((role) => `• ${role.name} (ID: ${role.id})`);
 
+    // Create an embed to display the roles
     const embed = new EmbedBuilder()
-      .setTitle(`${targetMember.user.tag}'s Roles`)
-      .setDescription(roles || "This member has no roles.")
+      .setTitle("Server Roles")
+      .setDescription(
+        serverRoles.length > 0
+          ? serverRoles.join("\n")
+          : "No custom roles found in this server."
+      )
       .setColor(0x00aeff)
-      .setThumbnail(targetMember.user.displayAvatarURL())
       .setFooter({
         text: `Requested by ${interaction.user.tag}`,
         iconURL: interaction.user.displayAvatarURL(),
       })
       .setTimestamp();
 
+    // Reply with the embed
     await interaction.reply({ embeds: [embed] });
   },
 };

@@ -1,72 +1,86 @@
-import {
-  ChatInputCommandInteraction,
-  PermissionFlagsBits,
-  SlashCommandBuilder,
-} from "discord.js";
 import { Command } from "../../types/command";
+import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 
-export const addRoleCommand: Command = {
+export const createrole: Command = {
   data: new SlashCommandBuilder()
-    .setName("addrole")
-    .setDescription("Adds a role to a user")
-    .addUserOption((option) =>
+    .setName("createrole")
+    .setDescription("Create a new role in the server")
+    .addStringOption((option) =>
       option
-        .setName("user")
-        .setDescription("The user to add the role to")
+        .setName("name")
+        .setDescription("Name of the new role")
         .setRequired(true)
     )
-    .addRoleOption((option) =>
+    .addStringOption((option) =>
       option
-        .setName("role")
-        .setDescription("The role to add to the user")
-        .setRequired(true)
+        .setName("color")
+        .setDescription("Hex color code for the role (optional)")
+        .setRequired(false)
     )
     .setDefaultMemberPermissions(
       PermissionFlagsBits.ManageGuild
     ) as SlashCommandBuilder,
-
-  execute: async (interaction: ChatInputCommandInteraction) => {
-    const user = interaction.options.getUser("user");
-    const role = interaction.options.getRole("role");
-
-    if (!user || !role) {
+  execute: async (interaction) => {
+    // Ensure the interaction is in a guild
+    if (!interaction.guild) {
       await interaction.reply({
-        content: "User or role not provided.",
+        content: "This command can only be used in a server.",
         ephemeral: true,
       });
       return;
     }
 
-    // Ensure the role is a valid Role object
-    const resolvedRole = interaction.guild?.roles.cache.get(role.id);
-    if (!resolvedRole) {
+    // Check if user has permissions to manage roles
+    // Use optional chaining and nullish coalescing to handle potential null
+    if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageRoles)) {
       await interaction.reply({
-        content: "Role not found in the server.",
+        content: "You do not have permission to create roles.",
         ephemeral: true,
       });
       return;
     }
 
-    const member = interaction.guild?.members.cache.get(user.id);
-
-    if (!member) {
-      await interaction.reply({
-        content: "Member not found in the server.",
-        ephemeral: true,
-      });
-      return;
-    }
+    // Get role name and color from options
+    const roleName = interaction.options.getString("name", true);
+    const colorOption = interaction.options.getString("color");
 
     try {
-      await member.roles.add(resolvedRole); // Use the resolved Role
+      // Validate color if provided
+      let roleColor;
+      if (colorOption) {
+        // Remove # if present and validate hex color
+        const sanitizedColor = colorOption.replace(/^#/, "");
+
+        // Check if it's a valid hex color (6 characters of hex)
+        if (!/^[0-9A-Fa-f]{6}$/.test(sanitizedColor)) {
+          await interaction.reply({
+            content:
+              "Invalid color code. Please use a valid 6-digit hex color (e.g., FF0000 for red).",
+            ephemeral: true,
+          });
+          return;
+        }
+
+        roleColor = parseInt(sanitizedColor, 16);
+      }
+
+      // Create the role
+      const newRole = await interaction.guild.roles.create({
+        name: roleName,
+        color: roleColor, // Will be undefined if no color provided
+        reason: `Role created by ${interaction.user.tag}`,
+      });
+
+      // Confirm role creation
       await interaction.reply({
-        content: `Successfully added the ${resolvedRole.name} role to ${user.username}.`,
-        ephemeral: true,
+        content: `Role **${newRole.name}** has been created successfully!`,
+        ephemeral: false,
       });
     } catch (error) {
-      console.error(error);
+      console.error("Error creating role:", error);
       await interaction.reply({
-        content: "There was an error adding the role.",
+        content:
+          "There was an error creating the role. Please check the role name and try again.",
         ephemeral: true,
       });
     }
