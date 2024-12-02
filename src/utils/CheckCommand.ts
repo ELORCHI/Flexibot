@@ -1,4 +1,8 @@
-import { ChatInputCommandInteraction, GuildChannel } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  GuildChannel,
+  GuildMember,
+} from "discord.js";
 import { PrismaClient } from "@prisma/client";
 
 interface CommandCheckResult {
@@ -31,6 +35,18 @@ export async function checkCommandPermissions(
     };
   }
 
+  const member = interaction.member as GuildMember;
+
+  // Check if user is the server owner
+  const isOwner = interaction.guild?.ownerId === member.id;
+
+  // Check if user has administrator permissions
+  const isAdministrator = member.permissions.has("Administrator");
+
+  // If the user is either the owner or an administrator
+  if (isOwner || isAdministrator) {
+    return { allowed: true };
+  }
   // Check if command is globally enabled
   if (!commandConfig.enabled) {
     return {
@@ -81,9 +97,9 @@ export async function checkCommandPermissions(
 
   // Get guild manager roles
   const guildManagerRoles = commandConfig.guild?.managerRoles || [];
-
+  console.log({ guildManagerRoles }, { memberRoleNames });
   // Check if command needs moderation role
-  if (commandConfig.needsModerationRole) {
+  if (commandConfig.needsModerationRole && guildManagerRoles.length) {
     // Check if user has either a manager role or an allowed role
     const hasManagerRole = memberRoleNames.some((roleName) =>
       guildManagerRoles.includes(String(roleName))
