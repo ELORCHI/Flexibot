@@ -1,5 +1,6 @@
 import { prisma } from "./prismaClient";
 import { CommandCategory } from "@prisma/client";
+import { commandCategories } from "./commandbyCategories";
 // Function to get a guild by ID
 export const getGuildById = async (guildId: string) => {
   try {
@@ -69,34 +70,6 @@ export const deleteGuild = async (guildId: string) => {
   }
 };
 
-// Update your command categories to match the enum
-const commandCategories = {
-  INFO: ["ping", "serverinfo", "userinfo"],
-  MODERATION: [
-    "clearwarn",
-    "delwarn",
-    "lock",
-    "mute",
-    "undeafen",
-    "warn",
-    "deafen",
-    "kick",
-    "modlogs",
-    "softban",
-    "unlock",
-  ],
-  ROLES: [
-    "addrank",
-    "addRole",
-    "delrank",
-    "ranks",
-    "rank",
-    "roleInfo",
-    "roles",
-  ],
-  UTILS: ["clean", "clear", "delslmode", "remind", "setnick", "slowmode"],
-};
-
 // Alternatively, you can use a type assertion with more safety
 export const createGuildWithDefaultCommands = async (guildData: {
   id: string;
@@ -111,11 +84,14 @@ export const createGuildWithDefaultCommands = async (guildData: {
     // Prepare commands data for batch creation
     const commandsData = Object.entries(commandCategories).flatMap(
       ([category, commands]) =>
-        commands.map((commandName) => ({
+        commands.map((commandInfo) => ({
           guildId: guild.id,
-          name: commandName,
+          name: commandInfo.name,
           category: category as keyof typeof CommandCategory, // Type safety
-          description: getCommandDescription(commandName),
+          description: commandInfo.description,
+          usage: commandInfo.usage,
+          example: commandInfo.example,
+          requiredpermissions: commandInfo.requiredpermissions,
         }))
     );
 
@@ -136,49 +112,6 @@ export const createGuildWithDefaultCommands = async (guildData: {
     throw error;
   }
 };
-
-// Helper function to get command descriptions
-function getCommandDescription(commandName: string): string {
-  // You can expand this with more detailed descriptions
-  const descriptions: Record<string, string> = {
-    // INFO category
-    ping: "Check the bot's latency",
-    serverinfo: "Get information about the server",
-    userinfo: "Get information about a user",
-
-    // MODERATION category
-    clearwarn: "Clear warnings for a user",
-    delwarn: "Delete a specific warning",
-    lock: "Lock a channel",
-    mute: "Mute a user",
-    undeafen: "Undeafen a user",
-    warn: "Warn a user",
-    deafen: "Deafen a user",
-    kick: "Kick a user from the server",
-    modlogs: "View moderation logs",
-    softban: "Soft ban a user",
-    unlock: "Unlock a channel",
-
-    // ROLES category
-    addrank: "Add a new rank",
-    addRole: "Add a role to a user",
-    delrank: "Delete a rank",
-    ranks: "List available ranks",
-    rank: "Check a user's rank",
-    roleInfo: "Get information about a role",
-    roles: "List server roles",
-
-    // UTILITY category
-    clean: "Clean messages in a channel",
-    clear: "Clear messages in a channel",
-    delslmode: "Delete slowmode setting",
-    remind: "Set a reminder",
-    setnick: "Set a user's nickname",
-    slowmode: "Set slowmode for a channel",
-  };
-
-  return descriptions[commandName] || "No description available";
-}
 
 export const deleteGuildWithAllRelatedRecords = async (guildId: string) => {
   try {
