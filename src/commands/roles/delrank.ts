@@ -2,7 +2,6 @@ import {
   ChatInputCommandInteraction,
   PermissionFlagsBits,
   SlashCommandBuilder,
-  SlashCommandIntegerOption,
 } from "discord.js";
 import { prisma } from "../../db/prismaClient";
 import { Command } from "../../types/command";
@@ -10,17 +9,11 @@ import { Command } from "../../types/command";
 export const delRankCommand: Command = {
   data: new SlashCommandBuilder()
     .setName("delrank")
-    .setDescription("Deletes a rank from a user and the system")
+    .setDescription("Deletes a rank from the system")
     .addStringOption((option) =>
       option
         .setName("rankname")
         .setDescription("The name of the rank to delete")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("guildid")
-        .setDescription("The guild where the rank exists")
         .setRequired(true)
     )
     .setDefaultMemberPermissions(
@@ -28,40 +21,32 @@ export const delRankCommand: Command = {
     ) as SlashCommandBuilder,
 
   execute: async (interaction: ChatInputCommandInteraction) => {
-    const rankName = interaction.options.getString("rankname");
-    const guildId = interaction.options.getString("guildid");
+    const rankName = interaction.options.getString("rankname", true);
+    const guildId = interaction.guildId;
 
-    if (!rankName || !guildId) {
+    if (!guildId) {
       await interaction.reply({
-        content: "Rank name or guild ID not provided.",
+        content: "This command can only be used in a server.",
         ephemeral: true,
       });
       return;
     }
 
     try {
-      // Fetch the rank from the database using rankName and guildId as the filter
+      // Fetch the rank from the database using rankName and guildId
       const rank = await prisma.rank.findFirst({
-        where: { rankName, guildId }, // Corrected query to use where with rankName and guildId
-        include: { UserRank: true }, // Include the UserRank relation
+        where: { rankName, guildId },
       });
 
       if (!rank) {
         await interaction.reply({
-          content: `Rank "${rankName}" not found in the specified guild.`,
+          content: `Rank "${rankName}" not found in this guild.`,
           ephemeral: true,
         });
         return;
       }
 
-      // Step 1: Unlink all users from this rank (delete from UserRank table)
-      for (const userRank of rank.UserRank) {
-        await prisma.userRank.delete({
-          where: { id: userRank.id },
-        });
-      }
-
-      // Step 2: Optionally, remove the rank from the users in Discord
+      // Optionally, remove the role from users in Discord
       const discordRole = interaction.guild?.roles.cache.find(
         (r) => r.name === rank.roleName
       );
@@ -76,9 +61,9 @@ export const delRankCommand: Command = {
         }
       }
 
-      // Step 3: Delete the rank from the database
+      // Delete the rank from the database
       await prisma.rank.delete({
-        where: { id: rank.id }, // Delete by rank ID
+        where: { id: rank.id },
       });
 
       await interaction.reply({

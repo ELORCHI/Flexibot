@@ -117,7 +117,14 @@ export const commandCategories = {
       description: "Create a new role in the server",
       needsModerationRol: false,
     },
-    // delrole
+    {
+      name: "delrole",
+      requiredpermissions: "Manage Server",
+      usage: "/delrole [name of the role]",
+      example: "/delrole birdowl",
+      description: "Create a new role in the server",
+      needsModerationRol: false,
+    },
     //nickk
   ],
   ROLES: [

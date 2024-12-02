@@ -1,5 +1,5 @@
 import { Command } from "../../types/command";
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -24,7 +24,6 @@ export const rank: Command = {
         .setDescription("The name of the rank")
         .setRequired(true)
     ) as SlashCommandBuilder,
-
   async execute(interaction) {
     const action = interaction.options.getString("action", true);
     const rankName = interaction.options.getString("rank_name", true);
@@ -32,7 +31,11 @@ export const rank: Command = {
     const guildId = interaction.guildId;
 
     if (!guildId) {
-      await interaction.reply("This command can only be used in a server.");
+      const embed = new EmbedBuilder()
+        .setTitle("Error")
+        .setDescription("This command can only be used in a server.")
+        .setColor("Red");
+      await interaction.reply({ embeds: [embed] });
       return;
     }
 
@@ -41,44 +44,64 @@ export const rank: Command = {
     });
 
     if (!rank) {
-      await interaction.reply(`The rank **${rankName}** does not exist.`);
+      const embed = new EmbedBuilder()
+        .setTitle("Rank Not Found")
+        .setDescription(`The rank **${rankName}** does not exist.`)
+        .setColor("Red");
+      await interaction.reply({ embeds: [embed] });
       return;
     }
 
     if (action === "join") {
-      const existing = await prisma.userRank.findFirst({
-        where: { userId, rankId: rank.id },
-      });
-
-      if (existing) {
-        await interaction.reply(
-          `You are already part of the rank **${rankName}**.`
-        );
+      if (rank.userIds.includes(userId)) {
+        const embed = new EmbedBuilder()
+          .setTitle("Already Joined")
+          .setDescription(`You are already part of the rank **${rankName}**.`)
+          .setColor("Yellow");
+        await interaction.reply({ embeds: [embed] });
         return;
       }
 
-      await prisma.userRank.create({
-        data: { userId, rankId: rank.id },
+      await prisma.rank.update({
+        where: { id: rank.id },
+        data: {
+          userIds: {
+            push: userId,
+          },
+        },
       });
 
-      await interaction.reply(`You have joined the rank **${rankName}**.`);
+      const embed = new EmbedBuilder()
+        .setTitle("Rank Joined")
+        .setDescription(
+          `You have successfully joined the rank **${rankName}**.`
+        )
+        .setColor("Green");
+      await interaction.reply({ embeds: [embed] });
     } else if (action === "leave") {
-      const existing = await prisma.userRank.findFirst({
-        where: { userId, rankId: rank.id },
-      });
-
-      if (!existing) {
-        await interaction.reply(
-          `You are not part of the rank **${rankName}**.`
-        );
+      if (!rank.userIds.includes(userId)) {
+        const embed = new EmbedBuilder()
+          .setTitle("Not Part of Rank")
+          .setDescription(`You are not part of the rank **${rankName}**.`)
+          .setColor("Yellow");
+        await interaction.reply({ embeds: [embed] });
         return;
       }
 
-      await prisma.userRank.delete({
-        where: { id: existing.id },
+      await prisma.rank.update({
+        where: { id: rank.id },
+        data: {
+          userIds: {
+            set: rank.userIds.filter((id) => id !== userId),
+          },
+        },
       });
 
-      await interaction.reply(`You have left the rank **${rankName}**.`);
+      const embed = new EmbedBuilder()
+        .setTitle("Rank Left")
+        .setDescription(`You have successfully left the rank **${rankName}**.`)
+        .setColor("Green");
+      await interaction.reply({ embeds: [embed] });
     }
   },
 };
