@@ -33,8 +33,8 @@ model Guild {
 
 enum CommandCategory {
   INFO
-  MODERATION
-  UTILS
+  MODERATOR
+  UTILITY
   ROLES
   MANAGER
 }
