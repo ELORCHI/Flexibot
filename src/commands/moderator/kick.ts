@@ -21,9 +21,6 @@ export const kick: Command = {
         .setName("reason")
         .setDescription("Reason for kicking the member")
         .setRequired(false)
-    )
-    .setDefaultMemberPermissions(
-      PermissionFlagsBits.KickMembers
     ) as SlashCommandBuilder,
 
   execute: async (interaction) => {

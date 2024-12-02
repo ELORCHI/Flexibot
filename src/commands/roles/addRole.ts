@@ -1,4 +1,8 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  PermissionFlagsBits,
+  SlashCommandBuilder,
+} from "discord.js";
 import { Command } from "../../types/command";
 
 export const addRoleCommand: Command = {
@@ -16,6 +20,9 @@ export const addRoleCommand: Command = {
         .setName("role")
         .setDescription("The role to add to the user")
         .setRequired(true)
+    )
+    .setDefaultMemberPermissions(
+      PermissionFlagsBits.ManageGuild
     ) as SlashCommandBuilder,
 
   execute: async (interaction: ChatInputCommandInteraction) => {

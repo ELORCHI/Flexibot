@@ -1,16 +1,22 @@
 import { Command } from "../../types/command";
-import { SlashCommandBuilder, TextChannel, PermissionFlagsBits } from "discord.js";
+import {
+  SlashCommandBuilder,
+  TextChannel,
+  PermissionFlagsBits,
+} from "discord.js";
 
 export const unlock: Command = {
   data: new SlashCommandBuilder()
     .setName("unlock")
-    .setDescription("Unlock a channel.")
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels) as SlashCommandBuilder,
-
+    .setDescription("Unlock a channel."),
 
   execute: async (interaction) => {
     // Ensure the bot has permission to manage channel permissions
-    if (!interaction.guild?.members.me?.permissions.has(PermissionFlagsBits.ManageChannels)) {
+    if (
+      !interaction.guild?.members.me?.permissions.has(
+        PermissionFlagsBits.ManageChannels
+      )
+    ) {
       await interaction.reply({
         content: "I don't have permission to manage channels.",
         ephemeral: true,
@@ -19,9 +25,12 @@ export const unlock: Command = {
     }
 
     if (interaction.channel instanceof TextChannel) {
-      await interaction.channel.permissionOverwrites.edit(interaction.guild.id, {
-        SendMessages: true,
-      });
+      await interaction.channel.permissionOverwrites.edit(
+        interaction.guild.id,
+        {
+          SendMessages: true,
+        }
+      );
 
       await interaction.reply(`${interaction.channel.name} is now unlocked.`);
     }

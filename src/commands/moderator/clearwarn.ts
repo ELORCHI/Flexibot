@@ -1,9 +1,5 @@
 import { Command } from "../../types/command";
-import {
-  SlashCommandBuilder,
-  GuildMember,
-  PermissionFlagsBits,
-} from "discord.js";
+import { SlashCommandBuilder, GuildMember } from "discord.js";
 import { prisma } from "../../db/prismaClient"; // Adjust the import path as needed
 
 export const clearwarn: Command = {
@@ -15,11 +11,7 @@ export const clearwarn: Command = {
         .setName("user")
         .setDescription("The member to clear warnings for")
         .setRequired(true)
-    )
-    .setDefaultMemberPermissions(
-      PermissionFlagsBits.KickMembers
     ) as SlashCommandBuilder,
-
   execute: async (interaction) => {
     // Ensure the interaction is in a guild
     if (!interaction.guild) {

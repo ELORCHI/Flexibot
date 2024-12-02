@@ -21,9 +21,6 @@ export const delwarn: Command = {
         .setName("warning_id")
         .setDescription("The ID of the warning to clear")
         .setRequired(true)
-    )
-    .setDefaultMemberPermissions(
-      PermissionFlagsBits.KickMembers
     ) as SlashCommandBuilder,
 
   execute: async (interaction) => {

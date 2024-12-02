@@ -1,4 +1,9 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  PermissionFlagsBits,
+  SlashCommandBuilder,
+  SlashCommandIntegerOption,
+} from "discord.js";
 import { prisma } from "../../db/prismaClient";
 import { Command } from "../../types/command";
 
@@ -17,6 +22,9 @@ export const delRankCommand: Command = {
         .setName("guildid")
         .setDescription("The guild where the rank exists")
         .setRequired(true)
+    )
+    .setDefaultMemberPermissions(
+      PermissionFlagsBits.ManageGuild
     ) as SlashCommandBuilder,
 
   execute: async (interaction: ChatInputCommandInteraction) => {

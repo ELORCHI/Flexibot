@@ -22,9 +22,6 @@ export const warn: Command = {
         .setName("reason")
         .setDescription("The reason for the warning")
         .setRequired(false)
-    )
-    .setDefaultMemberPermissions(
-      PermissionFlagsBits.KickMembers
     ) as SlashCommandBuilder,
 
   execute: async (interaction: ChatInputCommandInteraction) => {

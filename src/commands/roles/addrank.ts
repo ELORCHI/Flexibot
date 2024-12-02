@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 import { Command } from "../../types/command";
 import { PrismaClient } from "@prisma/client";
 
@@ -19,7 +19,11 @@ const addrank: Command = {
         .setName("role_name")
         .setDescription("The name of the Discord role")
         .setRequired(true)
+    )
+    .setDefaultMemberPermissions(
+      PermissionFlagsBits.ManageGuild
     ) as SlashCommandBuilder,
+
   async execute(interaction) {
     const guildId = interaction.guildId;
     const rankName = interaction.options.getString("rank_name", true);

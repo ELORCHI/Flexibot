@@ -47,9 +47,6 @@ export const LockCommand: Command = {
         .setName("reason")
         .setDescription("Reason for locking the channel")
         .setRequired(false)
-    )
-    .setDefaultMemberPermissions(
-      PermissionFlagsBits.ManageChannels
     ) as SlashCommandBuilder,
 
   async execute(interaction: ChatInputCommandInteraction) {

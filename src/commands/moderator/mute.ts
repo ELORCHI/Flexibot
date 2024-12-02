@@ -21,9 +21,6 @@ export const mute: Command = {
         .setName("reason")
         .setDescription("Reason for muting the member")
         .setRequired(false)
-    )
-    .setDefaultMemberPermissions(
-      PermissionFlagsBits.MuteMembers
     ) as SlashCommandBuilder,
 
   execute: async (interaction) => {
