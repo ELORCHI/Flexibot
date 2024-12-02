@@ -22,7 +22,7 @@ export const commandCategories = {
       description: "Get information about a user",
     },
   ],
-  MODERATION: [
+  MODERATOR: [
     {
       name: "deafen",
       requiredpermissions: "",
@@ -150,7 +150,7 @@ export const commandCategories = {
       description: "List server roles",
     },
   ],
-  UTILS: [
+  UTILITY: [
     {
       name: "clean",
       description: "",
