@@ -69,6 +69,11 @@ type GroupedCommands = {
     name: string;
     description: string | null;
     enabled: boolean;
+    id: number;
+    allowedChannels: string | null;
+    allowedRoles: string | null;
+    ignoredChannels: string | null;
+    ignoredRoles: string | null;
   }[];
 };
 
@@ -86,6 +91,10 @@ export async function getGuildCommandsByCategory(
       description: true,
       enabled: true,
       id: true,
+      allowedChannels: true,
+      allowedRoles: true,
+      ignoredChannels: true,
+      ignoredRoles: true,
     },
     orderBy: {
       name: "asc", // Optional: sort commands alphabetically within each category
@@ -104,6 +113,11 @@ export async function getGuildCommandsByCategory(
       name: command.name,
       description: command.description,
       enabled: command.enabled,
+      id: command.id,
+      allowedChannels: command.allowedChannels,
+      allowedRoles: command.allowedRoles,
+      ignoredChannels: command.ignoredChannels,
+      ignoredRoles: command.ignoredRoles,
     });
 
     return grouped;
