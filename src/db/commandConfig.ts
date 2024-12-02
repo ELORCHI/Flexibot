@@ -85,6 +85,7 @@ export async function getGuildCommandsByCategory(
       category: true,
       description: true,
       enabled: true,
+      id: true,
     },
     orderBy: {
       name: "asc", // Optional: sort commands alphabetically within each category
