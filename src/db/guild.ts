@@ -92,6 +92,7 @@ export const createGuildWithDefaultCommands = async (guildData: {
           usage: commandInfo.usage,
           example: commandInfo.example,
           requiredpermissions: commandInfo.requiredpermissions,
+          needsModerationRole: commandInfo.needsModerationRol,
         }))
     );
 
