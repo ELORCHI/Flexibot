@@ -18,17 +18,18 @@ model User {
 }
 
 model Guild {
-  id        String          @id // Discord server ID
-  name      String
-  icon      String?
-  addedById String? // Make the field optional by adding ?
-  addedBy   User?           @relation(fields: [addedById], references: [id]) // Add ? to make the relation optional
-  modLogs   ModerationLog[] // Moderation logs for this guild
-  warnings  Warning[] // Warnings issued in this guild
-  polls     Poll[] // Polls created in this guild
-  createdAt DateTime        @default(now())
-  Rank      Rank[]
-  commands  Command[]
+  id           String          @id // Discord server ID
+  name         String
+  icon         String?
+  addedById    String? // Make the field optional by adding ?
+  addedBy      User?           @relation(fields: [addedById], references: [id]) // Add ? to make the relation optional
+  modLogs      ModerationLog[] // Moderation logs for this guild
+  warnings     Warning[] // Warnings issued in this guild
+  polls        Poll[] // Polls created in this guild
+  createdAt    DateTime        @default(now())
+  Rank         Rank[]
+  commands     Command[]
+  managerRoles String[]
 }
 
 enum CommandCategory {
@@ -54,6 +55,7 @@ model Command {
   requiredpermissions String
   usage               String
   example             String
+  needsModerationRole Boolean
 
   @@unique([guildId, name])
 }

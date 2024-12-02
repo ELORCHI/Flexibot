@@ -6,6 +6,7 @@ export const commandCategories = {
       usage: "/ping",
       example: "/ping",
       description: "Check the bot's latency",
+      needsModerationRol: false,
     },
     {
       name: "serverinfo",
@@ -13,6 +14,7 @@ export const commandCategories = {
       usage: "/serverinfo",
       example: "/serverinfo",
       description: "Get information about the server",
+      needsModerationRol: false,
     },
     {
       name: "userinfo",
@@ -20,6 +22,7 @@ export const commandCategories = {
       usage: "/userinfo <user>",
       example: "/userinfo @JohnDoe",
       description: "Get information about a user",
+      needsModerationRol: false,
     },
   ],
   MODERATOR: [
@@ -29,6 +32,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Deafen a user",
+      needsModerationRol: false,
     },
     {
       name: "kick",
@@ -36,6 +40,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Kick a user from the server",
+      needsModerationRol: false,
     },
     {
       name: "lock",
@@ -43,6 +48,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Lock a channel",
+      needsModerationRol: true,
     },
     {
       name: "mute",
@@ -50,6 +56,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Mute a user",
+      needsModerationRol: true,
     },
     {
       name: "undeafen",
@@ -57,6 +64,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Undeafen a user",
+      needsModerationRol: true,
     },
     {
       name: "delwarn",
@@ -64,6 +72,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Delete a specific warning",
+      needsModerationRol: true,
     },
     {
       name: "warn",
@@ -71,6 +80,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Warn a user",
+      needsModerationRol: true,
     },
     {
       name: "modlogs",
@@ -78,6 +88,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "View moderation logs",
+      needsModerationRol: true,
     },
     {
       name: "softban",
@@ -85,6 +96,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Soft ban a user",
+      needsModerationRol: true,
     },
     // need to add ban and unban
   ],
@@ -95,6 +107,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Clear warnings for a user",
+      needsModerationRol: false,
     },
     {
       name: "addRole",
@@ -102,6 +115,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Add a role to a user",
+      needsModerationRol: false,
     },
     // delrole
     //nickk
@@ -113,6 +127,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Add a new rank",
+      needsModerationRol: false,
     },
     {
       name: "delrank",
@@ -120,6 +135,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Delete a rank",
+      needsModerationRol: false,
     },
     {
       name: "ranks",
@@ -127,6 +143,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "List available ranks",
+      needsModerationRol: false,
     },
     {
       name: "rank",
@@ -134,6 +151,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Check a user's rank",
+      needsModerationRol: false,
     },
     {
       name: "roleInfo",
@@ -141,6 +159,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Get information about a role",
+      needsModerationRol: false,
     },
     {
       name: "roles",
@@ -148,6 +167,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "List server roles",
+      needsModerationRol: true,
     },
   ],
   UTILITY: [
@@ -157,6 +177,7 @@ export const commandCategories = {
       requiredpermissions: "",
       usage: "",
       example: "",
+      needsModerationRol: true,
     },
     {
       name: "clear",
@@ -164,6 +185,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Clear messages in a channel",
+      needsModerationRol: true,
     },
     {
       name: "delslmode",
@@ -171,6 +193,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Delete slowmode setting",
+      needsModerationRol: true,
     },
     {
       name: "remind",
@@ -178,6 +201,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Set a reminder",
+      needsModerationRol: false,
     },
     {
       name: "setnick",
@@ -185,6 +209,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Set a user's nickname",
+      needsModerationRol: false,
     },
     {
       name: "slowmode",
@@ -192,6 +217,7 @@ export const commandCategories = {
       usage: "",
       example: "",
       description: "Set slowmode for a channel",
+      needsModerationRol: true,
     },
   ],
 };
