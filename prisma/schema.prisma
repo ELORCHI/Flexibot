@@ -54,7 +54,7 @@ model Command {
   requiredpermissions String
   usage               String
   example             String
-  needsModerationRole Boolean
+  needsModerationRole Boolean?        @default(false)
   updatesChannel      String?
 
   @@unique([guildId, name])
