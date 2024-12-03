@@ -14,10 +14,12 @@ export const userinfo: Command = {
 
   execute: async (interaction) => {
     const targetUser = interaction.options.getUser("user") || interaction.user;
+    const avatarURL = targetUser.displayAvatarURL({ size: 1024 });
 
     const embed = new EmbedBuilder()
-      .setColor(0x0099ff) // This is the correct numeric format for color
       .setTitle(`${targetUser.tag}'s Information`)
+      .setThumbnail(avatarURL)
+      .setColor("Blue")
       .addFields(
         { name: "User ID", value: targetUser.id, inline: true },
         { name: "Username", value: targetUser.username, inline: true },
@@ -31,7 +33,12 @@ export const userinfo: Command = {
           value: targetUser.createdAt.toDateString(),
           inline: false,
         }
-      );
+      )
+      .setFooter({
+        text: `Requested by ${interaction.user.tag}`,
+        iconURL: interaction.user.displayAvatarURL(),
+      })
+      .setTimestamp();
 
     await interaction.reply({ embeds: [embed] });
   },
