@@ -67,6 +67,14 @@ export const commandCategories = {
       needsModerationRol: true,
     },
     {
+      name: "unmute",
+      requiredpermissions: "Moderator",
+      usage: "unmute [user]",
+      example: "/unmute joe",
+      description: "remove Mute on user",
+      needsModerationRol: true,
+    },
+    {
       name: "undeafen",
       requiredpermissions: "Moderator",
       usage: "undeafen [user]",
@@ -106,6 +114,7 @@ export const commandCategories = {
       description: "ban and immediately unban to clear messages",
       needsModerationRol: true,
     },
+
     // need to add ban and unban
   ],
   MANAGER: [
