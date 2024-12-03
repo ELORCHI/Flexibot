@@ -3,7 +3,22 @@ import {
   SlashCommandBuilder,
   GuildMember,
   PermissionFlagsBits,
+  EmbedBuilder,
+  Colors,
 } from "discord.js";
+
+// Utility function to create embeds
+const createEmbed = (
+  title: string,
+  description: string,
+  color: `#${string}` | number
+) => {
+  return new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .setColor(color)
+    .setTimestamp();
+};
 
 export const setnick: Command = {
   data: new SlashCommandBuilder()
@@ -30,12 +45,16 @@ export const setnick: Command = {
     const nickname = interaction.options.getString("nickname")!;
 
     if (!targetMember || !(targetMember instanceof GuildMember)) {
-      await interaction.reply({
-        content: "Could not find the member to change the nickname of.",
-        ephemeral: true,
-      });
+      const errorEmbed = createEmbed(
+        "Error",
+        "Could not find the member to change the nickname of.",
+        Colors.Red
+      );
+      await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
       return;
     }
+
+    await interaction.deferReply({ ephemeral: true });
 
     // Ensure the bot has permission to change the nickname
     if (
@@ -43,16 +62,32 @@ export const setnick: Command = {
         PermissionFlagsBits.ManageNicknames
       )
     ) {
-      await interaction.reply({
-        content: "I don't have permission to change nicknames.",
-        ephemeral: true,
-      });
+      const permissionErrorEmbed = createEmbed(
+        "Permission Denied",
+        "I don't have permission to change nicknames.",
+        Colors.Red
+      );
+      await interaction.editReply({ embeds: [permissionErrorEmbed] });
       return;
     }
 
-    await targetMember.setNickname(nickname);
-    await interaction.reply(
-      `${targetMember.user.tag}'s nickname has been changed to ${nickname}`
-    );
+    try {
+      await targetMember.setNickname(nickname);
+
+      const successEmbed = createEmbed(
+        "Nickname Changed",
+        `${targetMember.user.tag}'s nickname has been changed to **${nickname}**.`,
+        Colors.Green
+      );
+      await interaction.editReply({ embeds: [successEmbed] });
+    } catch (error) {
+      const errorEmbed = createEmbed(
+        "Error",
+        "There was an error while changing the nickname. Please try again later.",
+        Colors.Red
+      );
+      console.error("Error setting nickname:", error);
+      await interaction.editReply({ embeds: [errorEmbed] });
+    }
   },
 };
