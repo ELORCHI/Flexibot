@@ -20,14 +20,13 @@ export default {
         ephemeral: true,
       });
     }
-    console.log({ interaction });
     try {
       // Check command permissions
       const permissionCheck = await checkCommandPermissions(
         interaction as ChatInputCommandInteraction,
         prisma
       );
-
+      console.log({ permissionCheck });
       if (!permissionCheck.allowed) {
         return await interaction.reply({
           content:

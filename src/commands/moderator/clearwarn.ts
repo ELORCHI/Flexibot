@@ -1,5 +1,5 @@
 import { Command } from "../../types/command";
-import { SlashCommandBuilder, GuildMember } from "discord.js";
+import { SlashCommandBuilder, GuildMember, EmbedBuilder } from "discord.js";
 import { prisma } from "../../db/prismaClient"; // Adjust the import path as needed
 
 export const clearwarn: Command = {
@@ -12,8 +12,8 @@ export const clearwarn: Command = {
         .setDescription("The member to clear warnings for")
         .setRequired(true)
     ) as SlashCommandBuilder,
+
   execute: async (interaction) => {
-    // Ensure the interaction is in a guild
     if (!interaction.guild) {
       await interaction.reply({
         content: "This command can only be used in a server.",
@@ -31,11 +31,9 @@ export const clearwarn: Command = {
       });
       return;
     }
-
+    await interaction.deferReply({ ephemeral: true });
     try {
-      // Use a transaction to ensure atomic operations
       const result = await prisma.$transaction(async (prisma) => {
-        // Count existing warnings before deletion
         const warningCount = await prisma.warning.count({
           where: {
             guildId: interaction.guild!.id,
@@ -43,7 +41,6 @@ export const clearwarn: Command = {
           },
         });
 
-        // Delete all warnings for the user in this guild
         const deletedWarnings = await prisma.warning.deleteMany({
           where: {
             guildId: interaction.guild!.id,
@@ -51,7 +48,6 @@ export const clearwarn: Command = {
           },
         });
 
-        // Create a moderation log entry for the warning clearance
         const moderationLog = await prisma.moderationLog.create({
           data: {
             guildId: interaction.guild!.id,
@@ -64,20 +60,30 @@ export const clearwarn: Command = {
 
         return { warningCount, deletedWarnings, moderationLog };
       });
+      console.log({ result });
+      const embed = new EmbedBuilder()
+        .setTitle("Warnings Cleared")
+        .setColor("Green")
+        .addFields(
+          { name: "Member", value: `${targetMember.user.tag}`, inline: true },
+          {
+            name: "Warnings Cleared",
+            value: result.warningCount.toString(),
+            inline: true,
+          },
+          {
+            name: "Moderator",
+            value: interaction.user.tag,
+            inline: true,
+          }
+        )
+        .setFooter({
+          text: `Guild: ${interaction.guild.name}`,
+        })
+        .setTimestamp();
 
-      // Construct response message
-      const responseMessage =
-        result.warningCount > 0
-          ? `Cleared ${result.warningCount} warning(s) for ${targetMember.user.tag}.`
-          : `${targetMember.user.tag} had no warnings to clear.`;
+      await interaction.editReply({ embeds: [embed] });
 
-      // Reply to the interaction
-      await interaction.reply({
-        content: responseMessage,
-        ephemeral: false,
-      });
-
-      // Optionally, send a DM to the user
       try {
         await targetMember.send({
           content: `All your warnings in ${
@@ -89,9 +95,8 @@ export const clearwarn: Command = {
       }
     } catch (error) {
       console.error("Error clearing warnings:", error);
-      await interaction.reply({
+      await interaction.editReply({
         content: "There was an error clearing the warnings.",
-        ephemeral: true,
       });
     }
   },
