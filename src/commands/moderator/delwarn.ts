@@ -2,9 +2,23 @@ import { Command } from "../../types/command";
 import {
   SlashCommandBuilder,
   GuildMember,
-  PermissionFlagsBits,
+  EmbedBuilder,
+  Colors, // Import Colors object
 } from "discord.js";
 import { prisma } from "../../db/prismaClient"; // Adjust the import path as needed
+
+// Function to create embed messages
+const createEmbed = (
+  title: string,
+  description: string,
+  color: `#${string}` | number
+) => {
+  return new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .setColor(color) // Use color directly (either hex or Colors constants)
+    .setTimestamp();
+};
 
 export const delwarn: Command = {
   data: new SlashCommandBuilder()
@@ -26,10 +40,12 @@ export const delwarn: Command = {
   execute: async (interaction) => {
     // Ensure the interaction is in a guild
     if (!interaction.guild) {
-      await interaction.reply({
-        content: "This command can only be used in a server.",
-        ephemeral: true,
-      });
+      const embed = createEmbed(
+        "Invalid Usage",
+        "This command can only be used in a server.",
+        Colors.Red // Use Colors.Red here directly
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
 
@@ -38,23 +54,27 @@ export const delwarn: Command = {
 
     // Validate member
     if (!targetMember || !(targetMember instanceof GuildMember)) {
-      await interaction.reply({
-        content:
-          "Could not find the member to clear warning for or the user is not a valid member.",
-        ephemeral: true,
-      });
+      const embed = createEmbed(
+        "Invalid Member",
+        "Could not find the member to clear the warning for or the user is not a valid member.",
+        Colors.Red // Use Colors.Red here directly
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
 
     // Validate warning ID
     if (!warningId) {
-      await interaction.reply({
-        content: "Please provide a valid warning ID.",
-        ephemeral: true,
-      });
+      const embed = createEmbed(
+        "Invalid Warning ID",
+        "Please provide a valid warning ID.",
+        Colors.Red // Use Colors.Red here directly
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
-
+    // Defer the reply so we can later edit the message
+    await interaction.deferReply({ ephemeral: true });
     try {
       // Use a transaction to ensure atomic operations
       const result = await prisma.$transaction(async (prisma) => {
@@ -91,11 +111,14 @@ export const delwarn: Command = {
         return { deletedWarning, moderationLog };
       });
 
-      // Reply to the interaction
-      await interaction.reply({
-        content: `Warning #${warningId} for ${targetMember.user.tag} has been cleared.`,
-        ephemeral: false,
-      });
+      const embed = createEmbed(
+        "Warning Cleared",
+        `Warning #${warningId} for ${targetMember.user.tag} has been cleared.`,
+        Colors.Green // Use Colors.Green here directly
+      );
+
+      // Edit the deferred reply with the success message
+      await interaction.editReply({ embeds: [embed] });
 
       // Optionally, send a DM to the user
       try {
@@ -110,22 +133,27 @@ export const delwarn: Command = {
     } catch (error) {
       console.error("Error clearing warning:", error);
 
+      let embed;
       // More specific error handling
       if (
         error instanceof Error &&
         error.message.includes("Warning not found")
       ) {
-        await interaction.reply({
-          content:
-            "The specified warning could not be found or does not belong to this user.",
-          ephemeral: true,
-        });
+        embed = createEmbed(
+          "Warning Not Found",
+          "The specified warning could not be found or does not belong to this user.",
+          Colors.Red // Use Colors.Red here directly
+        );
       } else {
-        await interaction.reply({
-          content: "An error occurred while trying to clear the warning.",
-          ephemeral: true,
-        });
+        embed = createEmbed(
+          "Error",
+          "An error occurred while trying to clear the warning.",
+          Colors.Red // Use Colors.Red here directly
+        );
       }
+
+      // Edit the deferred reply with the error message
+      await interaction.editReply({ embeds: [embed] });
     }
   },
 };
