@@ -3,8 +3,23 @@ import {
   SlashCommandBuilder,
   GuildMember,
   PermissionFlagsBits,
+  EmbedBuilder,
+  Colors,
 } from "discord.js";
 import { prisma } from "../../db/prismaClient"; // Adjust the path as needed
+
+// Function to create embed messages
+const createEmbed = (
+  title: string,
+  description: string,
+  color: `#${string}` | number
+) => {
+  return new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .setColor(color)
+    .setTimestamp();
+};
 
 export const kick: Command = {
   data: new SlashCommandBuilder()
@@ -25,10 +40,12 @@ export const kick: Command = {
 
   execute: async (interaction) => {
     if (!interaction.guild) {
-      await interaction.reply({
-        content: "This command can only be used in a server.",
-        ephemeral: true,
-      });
+      const embed = createEmbed(
+        "Invalid Usage",
+        "This command can only be used in a server.",
+        Colors.Red
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
 
@@ -38,11 +55,12 @@ export const kick: Command = {
 
     // Validate that the target is a guild member
     if (!targetMember || !(targetMember instanceof GuildMember)) {
-      await interaction.reply({
-        content:
-          "Could not find the member to kick or the user is not a valid member.",
-        ephemeral: true,
-      });
+      const embed = createEmbed(
+        "Invalid Member",
+        "Could not find the member to kick or the user is not a valid member.",
+        Colors.Red
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
 
@@ -52,22 +70,28 @@ export const kick: Command = {
         PermissionFlagsBits.KickMembers
       )
     ) {
-      await interaction.reply({
-        content: "I don't have permission to kick members.",
-        ephemeral: true,
-      });
+      const embed = createEmbed(
+        "Permission Denied",
+        "I don't have permission to kick members.",
+        Colors.Red
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
 
     // Check if the member is kickable
     if (!targetMember.kickable) {
-      await interaction.reply({
-        content:
-          "I cannot kick this member. They may have a higher role or I lack permissions.",
-        ephemeral: true,
-      });
+      const embed = createEmbed(
+        "Kick Failed",
+        "I cannot kick this member. They may have a higher role or I lack permissions.",
+        Colors.Red
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
+
+    await interaction.deferReply({ ephemeral: true });
+
     try {
       // Perform the kick
       await targetMember.kick(reason);
@@ -83,11 +107,15 @@ export const kick: Command = {
         },
       });
 
+      // Construct the success embed
+      const embed = createEmbed(
+        "Member Kicked",
+        `${targetMember.user.tag} has been kicked from the server.\nReason: ${reason}`,
+        Colors.Green
+      );
+
       // Notify the user who executed the command
-      await interaction.reply({
-        content: `${targetMember.user.tag} has been kicked from the server.\nReason: ${reason}`,
-        ephemeral: false,
-      });
+      await interaction.editReply({ embeds: [embed] });
 
       // Optionally, DM the kicked member
       try {
@@ -99,11 +127,13 @@ export const kick: Command = {
       }
     } catch (error) {
       console.error("Error kicking member:", error);
-      await interaction.reply({
-        content:
-          "An error occurred while trying to kick the member. Please try again later.",
-        ephemeral: true,
-      });
+
+      const embed = createEmbed(
+        "Error",
+        "An error occurred while trying to kick the member. Please try again later.",
+        Colors.Red
+      );
+      await interaction.editReply({ embeds: [embed] });
     }
   },
 };
