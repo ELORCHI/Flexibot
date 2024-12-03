@@ -133,6 +133,14 @@ export const commandCategories = {
       description: "Create a new role in the server",
       needsModerationRol: false,
     },
+    {
+      name: "setnick",
+      requiredpermissions: "Manager Server",
+      example: "setnick joe theone",
+      usage: "[user] [new nickname]",
+      description: "Set a user's nickname",
+      needsModerationRol: false,
+    },
     //nickk
   ],
   ROLES: [
@@ -217,14 +225,6 @@ export const commandCategories = {
       usage: "/remind 9000 remind me to drink tea",
       example: "remindme [time in seconds] [reminder]",
       description: "Set a reminder",
-      needsModerationRol: false,
-    },
-    {
-      name: "setnick",
-      requiredpermissions: "Manager Server",
-      example: "setnick joe theone",
-      usage: "[user] [new nickname]",
-      description: "Set a user's nickname",
       needsModerationRol: false,
     },
     {
