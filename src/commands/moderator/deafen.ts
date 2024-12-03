@@ -3,6 +3,7 @@ import {
   SlashCommandBuilder,
   GuildMember,
   PermissionFlagsBits,
+  EmbedBuilder,
 } from "discord.js";
 
 export const deafen: Command = {
@@ -41,6 +42,15 @@ export const deafen: Command = {
       return;
     }
 
+    // Check if the member is connected to a voice channel
+    if (!targetMember.voice.channel) {
+      await interaction.reply({
+        content: `${targetMember.user.tag} is not connected to a voice channel.`,
+        ephemeral: true,
+      });
+      return;
+    }
+
     if (targetMember.voice.serverDeaf) {
       await interaction.reply({
         content: `${targetMember.user.tag} is already deafened.`,
@@ -50,6 +60,20 @@ export const deafen: Command = {
     }
 
     await targetMember.voice.setDeaf(true);
-    await interaction.reply(`${targetMember.user.tag} has been deafened.`);
+
+    const embed = new EmbedBuilder()
+      .setTitle("Member Deafened")
+      .setColor("Red")
+      .addFields(
+        { name: "Member", value: `${targetMember.user.tag}`, inline: true },
+        { name: "Action", value: "Deafened", inline: true },
+        { name: "Moderator", value: interaction.user.tag, inline: true }
+      )
+      .setFooter({
+        text: `Guild: ${interaction.guild.name}`,
+      })
+      .setTimestamp();
+
+    await interaction.reply({ embeds: [embed] });
   },
 };
