@@ -5,6 +5,8 @@ import {
   TextChannel,
   OverwriteType,
   OverwriteResolvable,
+  EmbedBuilder,
+  Colors,
 } from "discord.js";
 import { Command } from "../../types/command";
 
@@ -32,10 +34,28 @@ function parseDuration(duration: string): number {
   return Math.min(calculatedDuration, maxDuration);
 }
 
+const createEmbed = (
+  title: string,
+  description: string,
+  color: `#${string}` | number
+) => {
+  return new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .setColor(color)
+    .setTimestamp();
+};
+
 export const LockCommand: Command = {
   data: new SlashCommandBuilder()
     .setName("lock")
     .setDescription("Lock a channel")
+    .addChannelOption((option) =>
+      option
+        .setName("channel")
+        .setDescription("The channel to lock")
+        .setRequired(true)
+    )
     .addStringOption((option) =>
       option
         .setName("duration")
@@ -52,15 +72,17 @@ export const LockCommand: Command = {
   async execute(interaction: ChatInputCommandInteraction) {
     // Ensure interaction is in a guild
     if (!interaction.guild || !interaction.channel) {
-      await interaction.reply({
-        content: "This command can only be used in a server channel.",
-        ephemeral: true,
-      });
+      const embed = createEmbed(
+        "Invalid Usage",
+        "This command can only be used in a server channel.",
+        Colors.Red
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
 
-    // Verify the channel is a text channel
-    const channel = interaction.channel as TextChannel;
+    // Get the channel to lock
+    const channel = interaction.options.getChannel("channel") as TextChannel;
 
     // Get optional duration and reason
     const duration = interaction.options.getString("duration");
@@ -89,11 +111,13 @@ export const LockCommand: Command = {
       // Modify channel permissions to prevent sending messages
       await channel.permissionOverwrites.set(newOverwrites, reason);
 
-      // Send confirmation message
-      await interaction.reply({
-        content: `🔒 Channel locked. Reason: ${reason}`,
-        ephemeral: false,
-      });
+      // Send confirmation embed
+      const successEmbed = createEmbed(
+        "Channel Locked",
+        `🔒 The channel ${channel.name} has been locked.\nReason: ${reason}`,
+        Colors.Green
+      );
+      await interaction.reply({ embeds: [successEmbed], ephemeral: false });
 
       // Handle timed lock if duration is provided
       if (duration) {
@@ -110,24 +134,36 @@ export const LockCommand: Command = {
               );
 
               // Send unlock notification
-              await channel.send("🔓 Channel has been unlocked.");
+              const unlockEmbed = createEmbed(
+                "Channel Unlocked",
+                `🔓 The channel ${channel.name} has been unlocked after the specified time.`,
+                Colors.Blue
+              );
+              await channel.send({ embeds: [unlockEmbed] });
             } catch (unlockError) {
               console.error("Error unlocking channel:", unlockError);
             }
           }, durationMs);
         } catch (durationError) {
+          const errorEmbed = createEmbed(
+            "Invalid Duration",
+            "The duration format is invalid. The channel will be locked indefinitely.",
+            Colors.Red
+          );
           await interaction.followUp({
-            content: "Invalid duration format. Channel locked without a timer.",
+            embeds: [errorEmbed],
             ephemeral: true,
           });
         }
       }
     } catch (error) {
       console.error("Lock command error:", error);
-      await interaction.reply({
-        content: "Failed to lock the channel. Please check my permissions.",
-        ephemeral: true,
-      });
+      const errorEmbed = createEmbed(
+        "Lock Failed",
+        "Failed to lock the channel. Please check my permissions.",
+        Colors.Red
+      );
+      await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
     }
   },
 };

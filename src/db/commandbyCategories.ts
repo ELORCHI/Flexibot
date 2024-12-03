@@ -45,9 +45,17 @@ export const commandCategories = {
     {
       name: "lock",
       requiredpermissions: "Moderator",
-      usage: "lock [channel]",
-      example: "/lock generale",
+      usage: "lock [channel] [duration 1h, 30m] [reason]",
+      example: "/lock generale 20m for testing",
       description: "Lock a channel",
+      needsModerationRol: true,
+    },
+    {
+      name: "unlock",
+      requiredpermissions: "Moderator",
+      usage: "unlock [channel]",
+      example: "/unlock generale",
+      description: "unLocks a channel",
       needsModerationRol: true,
     },
     {
