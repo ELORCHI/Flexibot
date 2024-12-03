@@ -5,6 +5,7 @@ import {
 } from "discord.js";
 import { prisma } from "../../db/prismaClient";
 import { Command } from "../../types/command";
+import { generateEmbed } from "../../utils/generateEmbed";
 
 export const delRankCommand: Command = {
   data: new SlashCommandBuilder()
@@ -25,13 +26,16 @@ export const delRankCommand: Command = {
     const guildId = interaction.guildId;
 
     if (!guildId) {
-      await interaction.reply({
-        content: "This command can only be used in a server.",
-        ephemeral: true,
-      });
+      const embed = generateEmbed(
+        "Error",
+        "This command can only be used in a server.",
+        "Red",
+        interaction.user
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
-
+    await interaction.deferReply({ ephemeral: true });
     try {
       // Fetch the rank from the database using rankName and guildId
       const rank = await prisma.rank.findFirst({
@@ -39,26 +43,14 @@ export const delRankCommand: Command = {
       });
 
       if (!rank) {
-        await interaction.reply({
-          content: `Rank "${rankName}" not found in this guild.`,
-          ephemeral: true,
-        });
-        return;
-      }
-
-      // Optionally, remove the role from users in Discord
-      const discordRole = interaction.guild?.roles.cache.find(
-        (r) => r.name === rank.roleName
-      );
-      if (discordRole) {
-        const membersWithRole = interaction.guild?.members.cache.filter(
-          (member) => member.roles.cache.has(discordRole.id)
+        const embed = generateEmbed(
+          "Rank Not Found",
+          `The rank **"${rankName}"** was not found in this guild.`,
+          "Red",
+          interaction.user
         );
-        if (membersWithRole) {
-          for (const member of membersWithRole.values()) {
-            await member.roles.remove(discordRole); // Remove the role from each member
-          }
-        }
+        await interaction.editReply({ embeds: [embed] });
+        return;
       }
 
       // Delete the rank from the database
@@ -66,16 +58,22 @@ export const delRankCommand: Command = {
         where: { id: rank.id },
       });
 
-      await interaction.reply({
-        content: `Successfully deleted the "${rankName}" rank from the system.`,
-        ephemeral: true,
-      });
+      const embed = generateEmbed(
+        "Rank Deleted",
+        `The rank **"${rankName}"** has been successfully deleted from the system.`,
+        "Green",
+        interaction.user
+      );
+      await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       console.error(error);
-      await interaction.reply({
-        content: "There was an error deleting the rank.",
-        ephemeral: true,
-      });
+      const embed = generateEmbed(
+        "Error",
+        "An error occurred while trying to delete the rank. Please try again later.",
+        "Red",
+        interaction.user
+      );
+      await interaction.editReply({ embeds: [embed] });
     }
   },
 };
