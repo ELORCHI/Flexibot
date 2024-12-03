@@ -1,4 +1,4 @@
-import { Command } from "../../types/command"; // Adjust the import path to match your project structure
+import { Command } from "../../types/command";
 import { SlashCommandBuilder } from "discord.js";
 
 export const ping: Command = {

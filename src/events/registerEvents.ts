@@ -4,7 +4,11 @@ import ClientWithCommands from "../types/discord";
 const eventsPath = __dirname;
 const eventFiles = fs
   .readdirSync(eventsPath)
-  .filter((file) => file.endsWith(".ts") && file != "registerEvents.ts");
+  .filter(
+    (file) =>
+      file.endsWith(".ts") ||
+      (file.endsWith(".js") && file != "registerEvents.ts")
+  );
 
 export default function registerEvets(client: ClientWithCommands) {
   for (const file of eventFiles) {

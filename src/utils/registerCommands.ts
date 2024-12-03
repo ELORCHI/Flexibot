@@ -24,7 +24,7 @@ function getCommandFiles(dir: string): string[] {
 
 async function loadCommands(client: ClientWithCommands, commandsDir: string) {
   // Use process.cwd() to get the base project directory
-  const resolvedCommandsDir = path.join(process.cwd(), "src", commandsDir);
+  const resolvedCommandsDir = path.join(process.cwd(), "dist", commandsDir);
   const commandFiles = getCommandFiles(resolvedCommandsDir);
   const loadedCommands = [];
 

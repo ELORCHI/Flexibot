@@ -5,7 +5,7 @@ import { setupAuthRoutes } from "./auth/auth";
 import registerEvets from "./events/registerEvents";
 import { loadCommands } from "./utils/registerCommands";
 dotenv.config();
-
+console.log(process.env.DATABASE_URL);
 const client = new ClientWithCommands({
   intents: [
     // Replace with your required intents

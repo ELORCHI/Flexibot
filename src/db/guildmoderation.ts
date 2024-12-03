@@ -49,7 +49,6 @@ export const createModerationLog = async (data: {
     const log = await prisma.moderationLog.create({
       data: {
         guildId: data.guildId,
-        userId: data.userId,
         action: data.action,
         reason: data.reason || "No reason provided",
         targetId: data.targetId, // Pass these fields to Prisma
