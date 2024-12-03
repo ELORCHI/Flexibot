@@ -3,9 +3,30 @@ import { Command } from "../../types/command";
 import {
   SlashCommandBuilder,
   GuildMember,
-  PermissionFlagsBits,
+  EmbedBuilder,
+  Colors,
   ChatInputCommandInteraction,
 } from "discord.js";
+
+// Function to create embed messages
+const createEmbed = (
+  title: string,
+  description: string,
+  color: `#${string}` | number,
+  warningId: string = "" // Optionally add warningId to the embed message
+) => {
+  const embed = new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .setColor(color)
+    .setTimestamp();
+
+  if (warningId) {
+    embed.addFields({ name: "Warning ID", value: warningId });
+  }
+
+  return embed;
+};
 
 export const warn: Command = {
   data: new SlashCommandBuilder()
@@ -27,10 +48,12 @@ export const warn: Command = {
   execute: async (interaction: ChatInputCommandInteraction) => {
     // Or type guard approach
     if (!interaction.guild) {
-      await interaction.reply({
-        content: "This command can only be used in a server.",
-        ephemeral: true,
-      });
+      const embed = createEmbed(
+        "Invalid Usage",
+        "This command can only be used in a server.",
+        Colors.Red
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
 
@@ -40,22 +63,27 @@ export const warn: Command = {
 
     // Validate target member
     if (!targetMember || !(targetMember instanceof GuildMember)) {
-      await interaction.reply({
-        content:
-          "Could not find the member to warn or the user is not a valid member.",
-        ephemeral: true,
-      });
+      const embed = createEmbed(
+        "Invalid Member",
+        "Could not find the member to warn or the user is not a valid member.",
+        Colors.Red
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
 
     // Ensure moderator can't warn themselves
     if (targetMember.id === interaction.user.id) {
-      await interaction.reply({
-        content: "You cannot warn yourself.",
-        ephemeral: true,
-      });
+      const embed = createEmbed(
+        "Self Warning Error",
+        "You cannot warn yourself.",
+        Colors.Red
+      );
+      await interaction.reply({ embeds: [embed], ephemeral: true });
       return;
     }
+
+    await interaction.deferReply({ ephemeral: true });
 
     try {
       // Use a transaction to ensure both warning and moderation log are created
@@ -93,15 +121,15 @@ export const warn: Command = {
       });
 
       // Construct warning message
-      const warningMessage = `${targetMember.user.tag} has been warned. 
-Reason: ${reason}
-Total Warnings: ${result.totalWarnings}`;
+      const embed = createEmbed(
+        "Warning Issued",
+        `**${targetMember.user.tag}** has been warned.\nReason: ${reason}\nTotal Warnings: ${result.totalWarnings}`,
+        Colors.Yellow,
+        result.warning.id // Add the warning ID to the embed
+      );
 
       // Reply to the interaction
-      await interaction.reply({
-        content: warningMessage,
-        ephemeral: false,
-      });
+      await interaction.editReply({ embeds: [embed] });
 
       // Optionally, send a DM to the warned user
       try {
@@ -115,10 +143,13 @@ Total Warnings: ${result.totalWarnings}`;
       }
     } catch (error) {
       console.error("Error creating warning or moderation log:", error);
-      await interaction.reply({
-        content: "There was an error processing the warning.",
-        ephemeral: true,
-      });
+
+      const embed = createEmbed(
+        "Error",
+        "There was an error processing the warning. Please try again later.",
+        Colors.Red
+      );
+      await interaction.editReply({ embeds: [embed] });
     }
   },
 };
