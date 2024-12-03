@@ -136,12 +136,19 @@ export const commandCategories = {
     {
       name: "setnick",
       requiredpermissions: "Manager Server",
-      example: "setnick joe theone",
+      example: "/setnick joe theone",
       usage: "[user] [new nickname]",
       description: "Set a user's nickname",
       needsModerationRol: false,
     },
-    //nickk
+    {
+      name: "nick",
+      requiredpermissions: "Manager Server",
+      example: "/nick newfriend",
+      usage: "[user] [new nickname]",
+      description: "Set a user's nickname",
+      needsModerationRol: false,
+    },
   ],
   ROLES: [
     {
